@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Daftar Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Id User</th>
+                    <th>Username</th>
+                    <th>FName</th>
+                    <th>LName</th>
+                    <th>Jabatan</th>
+                    <th>Bidang</th>
+                    <th>Email</th>
+                    <th>No HP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Joni</td>
+                    <td>Joni</td>
+                    <td>Jaya</td>
+                    <td>Staf</td>
+                    <td>Kepegawaian</td>
+                    <td>joni@ui.ac.id</td>
+                    <td>12345678</td>
+                  </tr>
+                 <tr>
+                    <td>2</td>
+                    <td>tina</td>
+                    <td>Tina</td>
+                    <td>Toon</td>
+                    <td>Staf</td>
+                    <td>Kepegawaian</td>
+                    <td>tina@ui.ac.id</td>
+                    <td>12345678</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>riki</td>
+                    <td>Riki</td>
+                    <td>Rangkuti</td>
+                    <td>Staf</td>
+                    <td>Kepegawaian</td>
+                    <td>riki@ui.ac.id</td>
+                    <td>12345678</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Daftar Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Tanggal Surat</th>
+                    <th>No Surat</th>
+                    <th>Perihal</th>
+                    <th>Ditujukan Kepada</th>
+                    <th>Nama Pengirim</th>
+                    <th>No Agenda</th>
+                    <th>Tingkat Kepentingan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>12 Juni 2014</td>
+                    <td>12062015</td>
+                    <td>Perihal Surat</td>
+                    <td>Dekan</td>
+                    <td>Staf</td>
+                    <td>0001</td>
+                    <td>Penting</td>
+                  </tr>
+                 <tr>
+                    <td>2</td>
+                    <td>15 Juni 2014</td>
+                    <td>15062015</td>
+                    <td>Perihal Surat</td>
+                    <td>Dekan</td>
+                    <td>Staf</td>
+                    <td>0002</td>
+                    <td>Normal</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>20 Juni 2014</td>
+                    <td>20062015</td>
+                    <td>Perihal Surat</td>
+                    <td>Dekan</td>
+                    <td>Staf</td>
+                    <td>0003</td>
+                    <td>Penting</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+
+{% endblock %}

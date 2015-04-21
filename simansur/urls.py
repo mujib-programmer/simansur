@@ -11,5 +11,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', views.login, name='login'),
     url(r'^surat/$', views.surat, name='surat'),
+    url(r'^surat/(?P<no_surat>[\w]+)/$', views.surat_detail, name='surat_detail'), # look for any sequence of alphanumeric characters (e.g. a-z, A-Z, or 0-9)
+    url(r'^surat_tambah/$', views.surat_tambah, name='surat_tambah'),
     url(r'^user/$', views.user, name='user'),
 )

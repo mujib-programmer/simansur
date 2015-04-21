@@ -1,6 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from MainApp.models import Surat, Disposisi, UserProfile
+from MainApp.forms import SuratForm
+
 # Create your views here.
 def index(request):
     context_dict = {'slug': 'login'}
@@ -8,9 +11,49 @@ def index(request):
     return render(request, 'MainApp/index.html', context_dict)
 
 def surat(request):
-    context_dict = {}
+
+    # get data surat
+    semua_surat = Surat.objects.all()
+
+    context_dict = {'semua_surat': semua_surat}
 
     return render(request, 'MainApp/surat.html', context_dict)
+
+def surat_detail(request, no_surat):
+
+    # get data surat
+    surat = Surat.objects.get(no_surat=no_surat)
+
+    context_dict = {'surat': surat}
+
+    return render(request, 'MainApp/surat_detail.html', context_dict)
+
+def surat_tambah(request):
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = SuratForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            # Save the new category to the database.
+            form.save(commit=True)
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            return surat(request)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = SuratForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'MainApp/surat_tambah.html', {'form': form})
+
+
 
 def user(request):
     context_dict = {}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Detail Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {% if surat %}
+
+              <table class="table">
+                <tbody>
+                <tr>
+                    <td>Tanggal Surat</td>
+                    <td>{{ surat.tanggal_surat_masuk }}</td>
+                </tr>
+                <tr>
+                    <td>No Surat</td>
+                    <td>{{ surat.no_surat }}</td>
+                </tr>
+                <tr>
+                    <td>Perihal</td>
+                    <td>{{ surat.perihal_surat }}</td>
+                </tr>
+                <tr>
+                    <td>Ditujukan Kepada</td>
+                    <td>{{ surat.id_penerima.username }}</td>
+                </tr>
+                <tr>
+                    <td>Nama Pengirim</td>
+                    <td>{{ surat.id_pencatat.username }}</td>
+                </tr>
+                <tr>
+                    <td>No Agenda</td>
+                    <td>{{ surat.no_agenda }}</td>
+                </tr>
+                <tr>
+                    <td>Tingkat Kepentingan</td>
+                    <td>{{ surat.tingkat_kepentingan }}</td>
+                </tr>
+                </tbody>
+              </table>
+
+                {% else %}
+                    <p>Surat yang diminta tidak ditemukan</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <br /> <br />
+
+{% endblock %}

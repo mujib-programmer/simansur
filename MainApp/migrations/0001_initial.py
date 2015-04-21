@@ -15,17 +15,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Disposisi',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('catatan_tambahan', models.CharField(max_length=25)),
                 ('timestamp_disposisi', models.DateTimeField(auto_now=True)),
                 ('tanggal_surat_disposisi', models.DateField()),
-                ('id_penerima_disposisi', models.ForeignKey(related_name='id_penerima_disposisi', to=settings.AUTH_USER_MODEL)),
+                ('id_penerima_disposisi', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='id_penerima_disposisi')),
+                ('id_pengirim_disposisi', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='id_pengirim_disposisi')),
             ],
+            options={
+            },
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Surat',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('no_surat', models.IntegerField(unique=True)),
                 ('no_agenda', models.IntegerField()),
                 ('perihal_surat', models.TextField()),
@@ -34,38 +38,31 @@ class Migration(migrations.Migration):
                 ('tingkat_kepentingan', models.CharField(max_length=15)),
                 ('dari', models.TextField()),
                 ('timestamp_surat', models.TimeField(auto_now=True)),
-                ('id_pencatat', models.ForeignKey(related_name='id_pencatat', to=settings.AUTH_USER_MODEL)),
-                ('id_penerima', models.ForeignKey(related_name='id_penerima', to=settings.AUTH_USER_MODEL)),
+                ('id_pencatat', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='id_pencatat')),
+                ('id_penerima', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='id_penerima')),
             ],
+            options={
+            },
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='UserPencatatSurat',
+            name='UserProfile',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bidang', models.CharField(default=b'', max_length=40)),
-                ('jabatan', models.CharField(default=b'', max_length=40)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('bidang', models.CharField(max_length=40, default='')),
+                ('jabatan', models.CharField(max_length=40, default='')),
                 ('role_pencatat', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='UserPenerimaSurat',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bidang', models.CharField(default=b'', max_length=40)),
-                ('jabatan', models.CharField(default=b'', max_length=40)),
                 ('no_telepon', models.BigIntegerField()),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+            },
+            bases=(models.Model,),
         ),
         migrations.AddField(
             model_name='disposisi',
             name='no_surat_disposisi',
-            field=models.ForeignKey(related_name='no_surat_disposisi', to='MainApp.Surat'),
-        ),
-        migrations.AddField(
-            model_name='disposisi',
-            name='user_name_pengirim_disposisi',
-            field=models.ForeignKey(related_name='user_name_pengirim_disposisi', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to='MainApp.Surat', related_name='no_surat_disposisi'),
+            preserve_default=True,
         ),
     ]

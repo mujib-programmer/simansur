@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-md-12">
 
-                <form class="form-horizontal" role="form" id="surat_form" method="post" action="/surat/tambah/">
+                <form class="form-horizontal" role="form" id="surat_form" method="post" action="/surat_tambah/" enctype="multipart/form-data">
 
                 {% csrf_token %}
                 {% for hidden in form.hidden_fields %}

@@ -88,6 +88,8 @@ STATICFILES_DIRS = (
     STATIC_PATH,
 )
 
+# Upload file dir
+UPLOAD_PATH = os.path.join(STATIC_PATH, 'upload')
 
 # Frontend Template
 

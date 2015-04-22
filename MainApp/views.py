@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 from django.shortcuts import render
 
 from MainApp.models import Surat, Disposisi, UserProfile
@@ -32,15 +33,14 @@ def surat_tambah(request):
 
     # A HTTP POST?
     if request.method == 'POST':
-        form = SuratForm(request.POST)
+        form = SuratForm(request.POST, request.FILES)
 
         # Have we been provided with a valid form?
         if form.is_valid():
-            # Save the new category to the database.
+
             form.save(commit=True)
 
-            # Now call the index() view.
-            # The user will be shown the homepage.
+            # go to surat view
             return surat(request)
         else:
             # The supplied form contained errors - just print them to the terminal.

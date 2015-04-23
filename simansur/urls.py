@@ -15,5 +15,11 @@ urlpatterns = patterns('',
     url(r'^surat_tambah/$', views.surat_tambah, name='surat_tambah'),
     url(r'^surat_edit/(?P<no_surat>[\w]+)/$', views.surat_edit, name='surat_edit'),
     url(r'^surat_delete/(?P<no_surat>[\w]+)/$', views.surat_delete, name='surat_delete'),
+    url(r'^surat_download/(?P<no_surat>[\w]+)/$', views.surat_download, name='surat_download'),
+
+    url(r'^disposisi_tambah/(?P<no_surat>[\w]+)/$', views.disposisi_tambah, name='disposisi_tambah'),
+    url(r'^disposisi_edit/(?P<id_disposisi>[\w]+)/$', views.disposisi_edit, name='disposisi_edit'),
+    url(r'^disposisi_delete/(?P<no_surat>[\w]+)/(?P<id_disposisi>[\w]+)/$', views.disposisi_delete, name='disposisi_delete'),
+
     url(r'^user/$', views.user, name='user'),
 )

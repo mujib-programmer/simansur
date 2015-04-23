@@ -8,7 +8,7 @@ class SuratAdmin(admin.ModelAdmin):
 
 
 class DisposisiAdmin(admin.ModelAdmin):
-    list_display = ('id_penerima_disposisi', 'no_surat_disposisi', 'id_pengirim_disposisi',
+    list_display = ('penerima_disposisi', 'surat', 'pengirim_disposisi',
                     'catatan_tambahan', 'timestamp_disposisi', 'tanggal_surat_disposisi')
     
 class UserProfileAdmin(admin.ModelAdmin):

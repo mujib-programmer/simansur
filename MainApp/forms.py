@@ -23,3 +23,12 @@ class SuratForm(forms.ModelForm):
         fields = ('no_surat', 'no_agenda','perihal_surat', 'tanggal_surat_masuk', 'keterangan_disposisi', 'tingkat_kepentingan', 'dari', 'id_penerima', 'id_pencatat', 'file_surat',)
 
 
+class DisposisiForm(forms.ModelForm):
+    penerima_disposisi = forms.ModelChoiceField(label='Penerima Disposisi', queryset=UserProfile.objects.all())
+    pengirim_disposisi = forms.ModelChoiceField(label='Pengirim Disposisi', queryset=UserProfile.objects.all())
+    tanggal_surat_disposisi = forms.DateField(label='Tanggal Surat Disposisi')
+    catatan_tambahan = forms.CharField(label='Catatan Tambahan')
+
+
+    class Meta:
+        model = Disposisi

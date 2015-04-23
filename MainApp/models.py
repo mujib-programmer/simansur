@@ -34,13 +34,14 @@ class Surat(models.Model):
         return str( self.no_surat )
 
 class Disposisi(models.Model):
-    id_penerima_disposisi = models.ForeignKey(UserProfile, null=False, related_name='id_penerima_disposisi')
-    no_surat_disposisi = models.ForeignKey(Surat, null=False, related_name='no_surat_disposisi')
-    id_pengirim_disposisi = models.ForeignKey(UserProfile, null=False, related_name='id_pengirim_disposisi')
+    id = models.AutoField(primary_key=True)
+    penerima_disposisi = models.ForeignKey(UserProfile, null=True, related_name='penerima_disposisi')
+    surat = models.ForeignKey(Surat, null=False, related_name='no_surat_disposisi')
+    pengirim_disposisi = models.ForeignKey(UserProfile, null=True, related_name='pengirim_disposisi')
     catatan_tambahan = models.CharField(max_length=25)
     timestamp_disposisi = models.DateTimeField(auto_now_add=True)
     tanggal_surat_disposisi = models.DateField(auto_now_add=False)
     
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
     def __str__(self):
-        return str( self.no_surat_disposisi )
+        return str( self.surat )

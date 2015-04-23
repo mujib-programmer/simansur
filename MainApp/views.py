@@ -147,6 +147,9 @@ def disposisi_tambah(request, no_surat):
         # Have we been provided with a valid form?
         if form.is_valid():
 
+            disposisi = form.save(commit=False)
+            disposisi.surat = dataSurat
+
             form.save(commit=True)
 
             # go to surat view
@@ -158,7 +161,6 @@ def disposisi_tambah(request, no_surat):
     else:
         # If the request was not a POST, display the form to enter details.
         form = DisposisiForm()
-        form.surat = dataSurat
 
     return render(request, 'MainApp/disposisi_tambah.html', {'form': form ,'no_surat': no_surat})
 
@@ -185,7 +187,6 @@ def disposisi_edit(request, id_disposisi):
     else:
         # If the request was not a POST, display the form to enter details.
         form = DisposisiForm(instance=dataDisposisi)
-        #form.surat = dataSurat
 
     return render(request, 'MainApp/disposisi_edit.html', {'form': form ,'id_disposisi': id_disposisi})
 

@@ -29,6 +29,6 @@ class DisposisiForm(forms.ModelForm):
     tanggal_surat_disposisi = forms.DateField(label='Tanggal Surat Disposisi')
     catatan_tambahan = forms.CharField(label='Catatan Tambahan')
 
-
     class Meta:
         model = Disposisi
+        exclude = ('surat',)

@@ -207,9 +207,25 @@ def disposisi_delete(request, no_surat, id_disposisi):
 
 
 def user(request):
-    context_dict = {}
+
+    # get data surat
+    semua_user_profile = UserProfile.objects.all()
+
+    context_dict = {'semua_user_profile': semua_user_profile}
 
     return render(request, 'MainApp/user.html', context_dict)
+
+def user_detail(request):
+    pass
+
+def user_tambah(request):
+    pass
+
+def user_edit(request, username):
+    pass
+
+def user_delete(request):
+    pass
 
 def login(request):
     context_dict = {'slug': 'login'}

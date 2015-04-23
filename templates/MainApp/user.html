@@ -6,57 +6,78 @@
 
 {% block content%}
         <div class="page-header">
-            <h1>Daftar Surat</h1>
+            <h1>Daftar User</h1>
         </div>
 
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
+                {% if semua_user_profile %}
+
               <table class="table">
                 <thead>
                   <tr>
-                    <th>Id User</th>
+                    <th>#</th>
                     <th>Username</th>
-                    <th>FName</th>
-                    <th>LName</th>
+                    <th>Email</th>
+                    <th>Groups</th>
+                    <th>Nama Depan</th>
+                    <th>Nama Belakang</th>
                     <th>Jabatan</th>
                     <th>Bidang</th>
-                    <th>Email</th>
                     <th>No HP</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
+                {% for user_profile in semua_user_profile %}
                   <tr>
-                    <td>1</td>
-                    <td>Joni</td>
-                    <td>Joni</td>
-                    <td>Jaya</td>
-                    <td>Staf</td>
-                    <td>Kepegawaian</td>
-                    <td>joni@ui.ac.id</td>
-                    <td>12345678</td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user_profile.user.username }}</td>
+                    <td>{{ user_profile.user.email }}</td>
+                    <td>
+                      {% for g in user_profile.user.groups.all %}
+                            {{ g.name }}
+                            {{ ', ' }}
+                      {% endfor %}
+                    </td>
+                    <td>{{ user_profile.user.first_name }}</td>
+                    <td>{{ user_profile.user.last_name }}</td>
+                    <td>{{ user_profile.jabatan }}</td>
+                    <td>{{ user_profile.bidang }}</td>
+                    <td>{{ user_profile.no_telepon }}</td>
+                    <td>
+                        <a href="/user/{{ user_profile.user.username }}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        <a href="{% url 'user_tambah' %}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        <a href="/user_edit/{{ user_profile.user.username }}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        <a href="/user_delete/{{ user_profile.user.username }}" onclick="return confirm('Apakah anda yakin ingin menghapus user {{ user_profile.user.username }} ?');">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                        </a>
+
+                    </td>
                   </tr>
-                 <tr>
-                    <td>2</td>
-                    <td>tina</td>
-                    <td>Tina</td>
-                    <td>Toon</td>
-                    <td>Staf</td>
-                    <td>Kepegawaian</td>
-                    <td>tina@ui.ac.id</td>
-                    <td>12345678</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>riki</td>
-                    <td>Riki</td>
-                    <td>Rangkuti</td>
-                    <td>Staf</td>
-                    <td>Kepegawaian</td>
-                    <td>riki@ui.ac.id</td>
-                    <td>12345678</td>
-                  </tr>
+                {% endfor %}
+
                 </tbody>
               </table>
+
+                {% else %}
+                 <p>Tidak ada user</p>
+
+                {% endif %}
             </div>
         </div>
 

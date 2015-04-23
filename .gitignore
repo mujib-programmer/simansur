@@ -1,6 +1,9 @@
 # Pycharms ide
 .idea/
 
+# uploaded file
+static/upload/
+
 # Django project files
 
 # Byte-compiled / optimized / DLL files

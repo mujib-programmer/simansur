@@ -29,6 +29,26 @@ def surat_detail(request, no_surat):
 
     return render(request, 'MainApp/surat_detail.html', context_dict)
 
+def surat_delete(request, no_surat):
+
+    try:
+        # get data surat
+        dataSurat = Surat.objects.get(no_surat=no_surat)
+
+        dataSurat.delete()
+
+    except Surat.DoesNotExist:
+        # jika data surat yang diinginkan untuk dihapus tidak ditemukan, tampilkan daftar semua surat
+        return surat(request)
+
+    # get data surat
+    semua_surat = Surat.objects.all()
+
+    context_dict = {'semua_surat': semua_surat}
+
+    return render(request, 'MainApp/surat.html', context_dict)
+
+
 def surat_tambah(request):
 
     # A HTTP POST?
@@ -53,6 +73,34 @@ def surat_tambah(request):
     # Render the form with error messages (if any).
     return render(request, 'MainApp/surat_tambah.html', {'form': form})
 
+
+def surat_edit(request, no_surat):
+
+    # get data surat
+    dataSurat = Surat.objects.get(no_surat=no_surat)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = SuratForm(request.POST, request.FILES, instance=dataSurat)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+
+            form.save(commit=True)
+
+            # go to surat view
+            return surat(request)
+
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = SuratForm(instance=dataSurat)
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'MainApp/surat_edit.html', {'form': form ,'no_surat': no_surat})
 
 
 def user(request):

@@ -37,8 +37,8 @@
                     <td>{{ surat.tanggal_surat_masuk }}</td>
                     <td>{{ surat.no_surat }}</td>
                     <td>{{ surat.perihal_surat }}</td>
-                    <td>{{ surat.id_penerima.username }}</td>
-                    <td>{{ surat.id_pencatat.username }}</td>
+                    <td>{{ surat.id_penerima }}</td>
+                    <td>{{ surat.id_pencatat }}</td>
                     <td>{{ surat.no_agenda }}</td>
                     <td>{{ surat.tingkat_kepentingan }}</td>
                     <td>
@@ -52,12 +52,16 @@
                             <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </button>
                         </a>
+                        <a href="/surat_edit/{{ surat.no_surat }}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </button>
+                        </a>
+                        <a href="/surat_delete/{{ surat.no_surat }}" onclick="return confirm('Apakah anda yakin ingin menghapus surat no {{ surat.no_surat }} ?');">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>
                         </button>
+                        </a>
 
                     </td>
                   </tr>

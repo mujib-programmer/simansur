@@ -11,8 +11,8 @@ class SuratForm(forms.ModelForm):
     tingkat_kepentingan = forms.CharField(label='Tingkat Kepentingan')
     dari = forms.CharField(label='Dari')
     #timestamp_surat = forms.DateTimeField()
-    id_penerima = forms.ModelChoiceField(label='Penerima', queryset=User.objects.all())
-    id_pencatat = forms.ModelChoiceField(label='Pencatat', queryset=User.objects.all())
+    id_penerima = forms.ModelChoiceField(label='Penerima', queryset=UserProfile.objects.all())
+    id_pencatat = forms.ModelChoiceField(label='Pencatat', queryset=UserProfile.objects.all())
     file_surat = forms.FileField(label='File Surat')
 
 

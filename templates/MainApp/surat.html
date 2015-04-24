@@ -73,6 +73,13 @@
 
                 {% else %}
                     <p>Tidak ada surat</p>
+                    <p>
+                        <a href="{% url 'surat_tambah' %}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true">Tambah Surat</span>
+                        </button>
+                        </a>
+                    </p>
                 {% endif %}
 
             </div>

@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from MainApp.models import Surat, Disposisi, UserProfile
 
 class SuratForm(forms.ModelForm):
@@ -32,3 +32,17 @@ class DisposisiForm(forms.ModelForm):
     class Meta:
         model = Disposisi
         exclude = ('surat',)
+
+class UserProfileForm(forms.Form):
+    username = forms.SlugField(label="Username", max_length=30)
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    email = forms.EmailField(label="Email")
+    groups = forms.ModelMultipleChoiceField(label="Groups", queryset=Group.objects.all())
+    first_name = forms.CharField(label="Nama Depan", max_length=30)
+    last_name = forms.CharField(label="Nama Belakang", max_length=30)
+    jabatan = forms.CharField(label="Jabatan", max_length=40)
+    bidang = forms.CharField(label="Bidang", max_length=40)
+    no_telepon = forms.IntegerField(label="No Telepon")
+
+
+

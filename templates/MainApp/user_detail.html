@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Detail User Profile</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {% if user_profile %}
+
+              <table class="table">
+                <tbody>
+                <tr>
+                    <td>Username</td>
+                    <td>{{ user_profile.user.username }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ user_profile.user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Groups</td>
+                    <td>
+                      {% for g in user_profile.user.groups.all %}
+                            {{ g.name }}
+                            {{ ', ' }}
+                      {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Nama Depan</td>
+                    <td>{{ user_profile.user.first_name }}</td>
+                </tr>
+                <tr>
+                    <td>Nama Belakang</td>
+                    <td>{{ user_profile.user.last_name }}</td>
+                </tr>
+                <tr>
+                    <td>Jabatan</td>
+                    <td>{{ user_profile.jabatan }}</td>
+                </tr>
+                <tr>
+                    <td>Bidang</td>
+                    <td>{{ user_profile.bidang }}</td>
+                </tr>
+                <tr>
+                    <td>No HP</td>
+                    <td>{{ user_profile.no_telepon }}</td>
+                </tr>
+                </tbody>
+              </table>
+
+                {% else %}
+                    <p>User yang diminta tidak ditemukan</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <br /> <br />
+
+
+
+{% endblock %}

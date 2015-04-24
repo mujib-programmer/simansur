@@ -23,8 +23,8 @@ urlpatterns = patterns('',
     url(r'^disposisi_delete/(?P<no_surat>[\w]+)/(?P<id_disposisi>[\w]+)/$', views.disposisi_delete, name='disposisi_delete'),
 
     url(r'^user/$', views.user, name='user'),
-    url(r'^user/(?P<username>[\w]+)/$', views.user_detail, name='user_detail'),
+    url(r'^user/(?P<username>[\w\-]+)/$', views.user_detail, name='user_detail'),
     url(r'^user_tambah/$', views.user_tambah, name='user_tambah'),
-    url(r'^user_edit/(?P<username>[\w]+)/$', views.user_edit, name='user_edit'),
-    url(r'^user_delete/(?P<username>[\w]+)/$', views.user_delete, name='user_delete'),
+    url(r'^user_edit/(?P<username>[\w\-]+)/$', views.user_edit, name='user_edit'),
+    url(r'^user_delete/(?P<username>[\w\-]+)/$', views.user_delete, name='user_delete'),
 )

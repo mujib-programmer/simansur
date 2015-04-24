@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 
 from MainApp.models import Surat, Disposisi, UserProfile
-from MainApp.forms import SuratForm, DisposisiForm
+from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
 # Create your views here.
 def index(request):
@@ -215,17 +215,156 @@ def user(request):
 
     return render(request, 'MainApp/user.html', context_dict)
 
-def user_detail(request):
-    pass
+def user_detail(request, username):
+
+    try:
+        # get data user
+        user = User.objects.get(username=username)
+
+        # get data userprofile
+        user_profile = UserProfile.objects.get(user=user)
+
+
+    except Disposisi.DoesNotExist:
+         user_profile = None
+
+    context_dict = {'user_profile': user_profile}
+
+    return render(request, 'MainApp/user_detail.html', context_dict)
+
 
 def user_tambah(request):
-    pass
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, )
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            data_form = form.cleaned_data
+
+            try:
+                User.objects.get(username=data_form.get('username'))
+                # kembali ke halaman list user
+                return user(request)
+
+            except User.DoesNotExist:
+
+                # membuat object user
+                user_baru = User(username=data_form.get('username'), email=data_form.get('email'), password=data_form.get('username'))
+                user_baru.set_password(data_form.get('password')) # atur ulang password sesuai input pengguna
+                user_baru.first_name = data_form.get('first_name')
+                user_baru.last_name = data_form.get('last_name')
+                user_baru.save()
+
+
+                # tambahkan user ke group yang dipilih
+                groups_terpilih = data_form.get('groups')
+                for group in groups_terpilih:
+                    user_baru.groups.add(group)
+
+                # membuat user profile baru
+                user_profile_baru = UserProfile(user=user_baru)
+                user_profile_baru.bidang = data_form.get('bidang')
+                user_profile_baru.jabatan = data_form.get('jabatan')
+                user_profile_baru.no_telepon = data_form.get('no_telepon')
+                user_profile_baru.role_pencatat = False
+                user_profile_baru.save()
+
+                #form.save(commit=false)
+
+                # go to surat view
+                return user(request)
+
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = UserProfileForm()
+
+    return render(request, 'MainApp/user_tambah.html', {'form': form})
+
 
 def user_edit(request, username):
-    pass
 
-def user_delete(request):
-    pass
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            data_form = form.cleaned_data
+
+            # membuat object user
+            data_user = User.objects.get(username=username)
+            data_user.email = data_form.get('email')
+            data_user.set_password(data_form.get('password'))
+            data_user.first_name = data_form.get('first_name')
+            data_user.last_name = data_form.get('last_name')
+            data_user.save()
+
+            # hapus semua group untuk user
+            data_user.groups.clear()
+
+            # tambahkan user ke group yang dipilih
+            groups_terpilih = data_form.get('groups')
+            for group in groups_terpilih:
+                data_user.groups.add(group)
+
+            # membuat user profile baru
+            data_user_profile = UserProfile.objects.get(user=data_user)
+            data_user_profile.bidang = data_form.get('bidang')
+            data_user_profile.jabatan = data_form.get('jabatan')
+            data_user_profile.no_telepon = data_form.get('no_telepon')
+            data_user_profile.role_pencatat = False
+            data_user_profile.save()
+
+            # go to surat view
+            return user(request)
+
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+
+        # generate data untuk ditampilkan di form
+        data_user = User.objects.get(username=username)
+        data_user_profile = UserProfile.objects.get(user=data_user)
+
+        initial = {}
+        initial['username'] = data_user.username
+        initial['password'] = ''
+        initial['email'] = data_user.email
+        initial['groups'] = data_user.groups.values_list('id',flat=True) # set groups list with initial selected value
+        initial['first_name'] = data_user.first_name
+        initial['last_name'] = data_user.last_name
+        initial['bidang'] = data_user_profile.bidang
+        initial['jabatan'] = data_user_profile.jabatan
+        initial['no_telepon'] = data_user_profile.no_telepon
+
+        form = UserProfileForm(initial=initial)
+
+    return render(request, 'MainApp/user_edit.html', {'form': form ,'username': username})
+
+
+def user_delete(request, username):
+
+    try:
+        # get user
+        data_user = User.objects.get(username=username)
+        # get data user profile
+        data_user_profile = UserProfile.objects.get(user=data_user)
+
+        # delete data user profile and then delete user
+        data_user_profile.delete()
+        data_user.delete()
+
+    except User.DoesNotExist:
+        pass
+
+    return user(request)
+
 
 def login(request):
     context_dict = {'slug': 'login'}

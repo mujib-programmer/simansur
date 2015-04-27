@@ -40,6 +40,7 @@ class UserProfileForm(forms.Form):
     groups = forms.ModelMultipleChoiceField(label="Groups", queryset=Group.objects.all())
     first_name = forms.CharField(label="Nama Depan", max_length=30)
     last_name = forms.CharField(label="Nama Belakang", max_length=30)
+    is_active = forms.BooleanField(label="Status Aktif", required=False)
     jabatan = forms.CharField(label="Jabatan", max_length=40)
     bidang = forms.CharField(label="Bidang", max_length=40)
     no_telepon = forms.IntegerField(label="No Telepon")

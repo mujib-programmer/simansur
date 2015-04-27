@@ -6,7 +6,13 @@
 
 {% block content%}
         <div class="page-header">
-            <h2>Halo USERNAME</h2>
+
+            {% if user.is_authenticated %}
+                <h2>Halo {{ user.username }}!</h2>
+            {% else %}
+                <h2>Halo pengunjung!</h2>
+            {% endif %}
+
             <h1>Selamat Datang di Sistem Informasi Manajemen Surat (Dokumen)</h1>
         </div>
          <div class="well">

@@ -11,6 +11,27 @@
     </head>
 
     <body role="document" id="{% block body-id %}body{% endblock %}">
+        {% block alert %}
+            {% if alert_type == "success" %}
+                <div class="alert alert-success alert-dismissible text-center" role="alert">
+                    {{ alert_message }}
+                </div>
+            {% elif alert_type == "info" %}
+                <div class="alert alert-info alert-dismissible text-center" role="alert">
+                    {{ alert_message }}
+                </div>
+            {% elif alert_type == "warning" %}
+                <div class="alert alert-warning alert-dismissible text-center" role="alert">
+                    {{ alert_message }}
+                </div>
+            {% elif alert_type == "danger" %}
+                <div class="alert alert-danger alert-dismissible text-center" role="alert">
+                    {{ alert_message }}
+                </div>
+            {% else %}
+
+            {% endif %}
+        {% endblock %}
 
         {% block jumbotron %}
         <div class="page-header text-center">
@@ -33,17 +54,28 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'surat' %}">Kotak Masuk</a></li>
+                <li class="{{ page_home_active }}"><a href="{% url 'home' %}">Home</a></li>
+
+                {% if user.is_authenticated %}
+                <li class="{{ page_surat_active }}"><a href="{% url 'surat' %}">Kotak Masuk</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Surat <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Track Surat</a></li>
-                    <li><a href="#">Lihat Statistik</a></li>
+                    <li class="{{ page_track_surat_active }}"><a href="#">Track Surat</a></li>
+                    <li class="{{ page_statistic_surat_active }}"><a href="#">Lihat Statistik</a></li>
                   </ul>
                 </li>
-                <li><a href="{% url 'user' %}">User</a></li>
-                <li><a href="{% url 'login' %}">Login</a></li>
+                <li class="{{ page_user_active }}"><a href="{% url 'user' %}">User</a></li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li class="{{ page_login_active }}"><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+
+
+
               </ul>
             </div><!--/.nav-collapse -->
           </div>

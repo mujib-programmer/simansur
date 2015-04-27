@@ -1,26 +1,30 @@
 import  os
-from django.http import HttpResponse
-from django.contrib.auth.models import User
 from django.shortcuts import render
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from MainApp.models import Surat, Disposisi, UserProfile
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
 # Create your views here.
 def index(request):
-    context_dict = {'slug': 'login'}
+    context_dict = {'slug': 'login', 'page_home_active':'active'}
 
     return render(request, 'MainApp/index.html', context_dict)
 
+@login_required
 def surat(request):
 
     # get data surat
     semua_surat = Surat.objects.all()
 
-    context_dict = {'semua_surat': semua_surat}
+    context_dict = {'semua_surat': semua_surat, 'page_surat_active':'active'}
 
     return render(request, 'MainApp/surat.html', context_dict)
 
+@login_required
 def surat_detail(request, no_surat):
 
     # get data surat
@@ -33,10 +37,11 @@ def surat_detail(request, no_surat):
     except Disposisi.DoesNotExist:
          semua_disposisi_surat = None
 
-    context_dict = {'surat': dataSurat, 'semua_disposisi_surat': semua_disposisi_surat}
+    context_dict = {'surat': dataSurat, 'semua_disposisi_surat': semua_disposisi_surat, 'page_surat_active':'active'}
 
     return render(request, 'MainApp/surat_detail.html', context_dict)
 
+@login_required
 def surat_delete(request, no_surat):
 
     try:
@@ -52,11 +57,11 @@ def surat_delete(request, no_surat):
     # get data surat
     semua_surat = Surat.objects.all()
 
-    context_dict = {'semua_surat': semua_surat}
+    context_dict = {'semua_surat': semua_surat, 'page_surat_active':'active'}
 
     return render(request, 'MainApp/surat.html', context_dict)
 
-
+@login_required
 def surat_tambah(request):
 
     # A HTTP POST?
@@ -79,9 +84,9 @@ def surat_tambah(request):
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render(request, 'MainApp/surat_tambah.html', {'form': form})
+    return render(request, 'MainApp/surat_tambah.html', {'form': form, 'page_surat_active':'active'})
 
-
+@login_required
 def surat_edit(request, no_surat):
 
     # get data surat
@@ -108,8 +113,9 @@ def surat_edit(request, no_surat):
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render(request, 'MainApp/surat_edit.html', {'form': form ,'no_surat': no_surat})
+    return render(request, 'MainApp/surat_edit.html', {'form': form ,'no_surat': no_surat, 'page_surat_active':'active'})
 
+@login_required
 def surat_download(request, no_surat):
 
     try:
@@ -131,10 +137,7 @@ def surat_download(request, no_surat):
         # jika data surat yang diinginkan untuk dihapus tidak ditemukan, tampilkan daftar semua surat
         return surat_detail(request, no_surat)
 
-
-
-
-
+@login_required
 def disposisi_tambah(request, no_surat):
 
     # get data surat
@@ -162,9 +165,9 @@ def disposisi_tambah(request, no_surat):
         # If the request was not a POST, display the form to enter details.
         form = DisposisiForm()
 
-    return render(request, 'MainApp/disposisi_tambah.html', {'form': form ,'no_surat': no_surat})
+    return render(request, 'MainApp/disposisi_tambah.html', {'form': form ,'no_surat': no_surat, 'page_surat_active':'active'})
 
-
+@login_required
 def disposisi_edit(request, id_disposisi):
 
     dataDisposisi = Disposisi.objects.get(id=id_disposisi)
@@ -188,8 +191,9 @@ def disposisi_edit(request, id_disposisi):
         # If the request was not a POST, display the form to enter details.
         form = DisposisiForm(instance=dataDisposisi)
 
-    return render(request, 'MainApp/disposisi_edit.html', {'form': form ,'id_disposisi': id_disposisi})
+    return render(request, 'MainApp/disposisi_edit.html', {'form': form ,'id_disposisi': id_disposisi, 'page_surat_active':'active'})
 
+@login_required
 def disposisi_delete(request, no_surat, id_disposisi):
     try:
         # get data surat
@@ -205,13 +209,13 @@ def disposisi_delete(request, no_surat, id_disposisi):
 
     #return render(request, 'MainApp/surat.html', context_dict)
 
-
+@login_required
 def user(request):
 
     # get data surat
     semua_user_profile = UserProfile.objects.all()
 
-    context_dict = {'semua_user_profile': semua_user_profile}
+    context_dict = {'semua_user_profile': semua_user_profile, 'page_user_active':'active'}
 
     return render(request, 'MainApp/user.html', context_dict)
 
@@ -228,11 +232,11 @@ def user_detail(request, username):
     except Disposisi.DoesNotExist:
          user_profile = None
 
-    context_dict = {'user_profile': user_profile}
+    context_dict = {'user_profile': user_profile, 'page_user_active':'active'}
 
     return render(request, 'MainApp/user_detail.html', context_dict)
 
-
+@login_required
 def user_tambah(request):
 
     # A HTTP POST?
@@ -255,6 +259,7 @@ def user_tambah(request):
                 user_baru.set_password(data_form.get('password')) # atur ulang password sesuai input pengguna
                 user_baru.first_name = data_form.get('first_name')
                 user_baru.last_name = data_form.get('last_name')
+                user_baru.is_active = data_form.get('is_active')
                 user_baru.save()
 
 
@@ -283,9 +288,9 @@ def user_tambah(request):
         # If the request was not a POST, display the form to enter details.
         form = UserProfileForm()
 
-    return render(request, 'MainApp/user_tambah.html', {'form': form})
+    return render(request, 'MainApp/user_tambah.html', {'form': form, 'page_user_active':'active'})
 
-
+@login_required
 def user_edit(request, username):
 
     # A HTTP POST?
@@ -302,6 +307,7 @@ def user_edit(request, username):
             data_user.set_password(data_form.get('password'))
             data_user.first_name = data_form.get('first_name')
             data_user.last_name = data_form.get('last_name')
+            data_user.is_active = data_form.get('is_active')
             data_user.save()
 
             # hapus semua group untuk user
@@ -339,15 +345,16 @@ def user_edit(request, username):
         initial['groups'] = data_user.groups.values_list('id',flat=True) # set groups list with initial selected value
         initial['first_name'] = data_user.first_name
         initial['last_name'] = data_user.last_name
+        initial['is_active'] = data_user.is_active
         initial['bidang'] = data_user_profile.bidang
         initial['jabatan'] = data_user_profile.jabatan
         initial['no_telepon'] = data_user_profile.no_telepon
 
         form = UserProfileForm(initial=initial)
 
-    return render(request, 'MainApp/user_edit.html', {'form': form ,'username': username})
+    return render(request, 'MainApp/user_edit.html', {'form': form ,'username': username, 'page_user_active':'active'})
 
-
+@login_required
 def user_delete(request, username):
 
     try:
@@ -365,8 +372,58 @@ def user_delete(request, username):
 
     return user(request)
 
+def user_login(request):
 
-def login(request):
-    context_dict = {'slug': 'login'}
+    template_dict = {'page_login_active':'active'}
 
-    return render(request, 'MainApp/login.html', context_dict)
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        # Gather the username and password provided by the user.
+        # This information is obtained from the login form.
+                # We use request.POST.get('<variable>') as opposed to request.POST['<variable>'],
+                # because the request.POST.get('<variable>') returns None, if the value does not exist,
+                # while the request.POST['<variable>'] will raise key error exception
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Use Django's machinery to attempt to see if the username/password
+        # combination is valid - a User object is returned if it is.
+        user = authenticate(username=username, password=password)
+
+        # If we have a User object, the details are correct.
+        # If None (Python's way of representing the absence of a value), no user
+        # with matching credentials was found.
+        if user:
+            # Is the account active? It could have been disabled.
+            if user.is_active:
+                # If the account is valid and active, we can log the user in.
+                # We'll send the user back to the homepage.
+                login(request, user)
+                return HttpResponseRedirect('/surat/')
+            else:
+                # An inactive account was used - no logging in!
+                template_dict['alert_type'] = 'danger'
+                template_dict['alert_message'] = "Akun Simansur %s dinonaktifkan!" % username
+                return render(request, 'MainApp/login.html', template_dict)
+        else:
+            # Bad login details were provided. So we can't log the user in.
+            template_dict['alert_type'] = 'danger'
+            template_dict['alert_message'] = "Invalid login details: {0}, {1}".format(username, password)
+            return render(request, 'MainApp/login.html', template_dict)
+
+
+    # The request is not a HTTP POST, so display the login form.
+    # This scenario would most likely be a HTTP GET.
+    else:
+        # No context variables to pass to the template system, hence the
+        # blank dictionary object...
+        return render(request, 'MainApp/login.html', template_dict)
+
+# Use the login_required() decorator to ensure only those logged in can access the view.
+@login_required
+def user_logout(request):
+    # Since we know the user is logged in, we can now just log them out.
+    logout(request)
+
+    # Take the user back to the homepage.
+    return HttpResponseRedirect('/')

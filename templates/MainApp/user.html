@@ -22,6 +22,7 @@
                     <th>Groups</th>
                     <th>Nama Depan</th>
                     <th>Nama Belakang</th>
+                    <th>Status Aktif</th>
                     <th>Jabatan</th>
                     <th>Bidang</th>
                     <th>No HP</th>
@@ -42,6 +43,7 @@
                     </td>
                     <td>{{ user_profile.user.first_name }}</td>
                     <td>{{ user_profile.user.last_name }}</td>
+                    <td>{{ user_profile.user.is_active }}</td>
                     <td>{{ user_profile.jabatan }}</td>
                     <td>{{ user_profile.bidang }}</td>
                     <td>{{ user_profile.no_telepon }}</td>

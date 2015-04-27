@@ -9,7 +9,8 @@ urlpatterns = patterns('',
 
     url(r'^$', views.index, name='home'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/$', views.login, name='login'),
+    url(r'^login/$', views.user_login, name='login'),
+    url(r'^logout/$', views.user_logout, name='logout'),
 
     url(r'^surat/$', views.surat, name='surat'),
     url(r'^surat/(?P<no_surat>[\w]+)/$', views.surat_detail, name='surat_detail'), # look for any sequence of alphanumeric characters (e.g. a-z, A-Z, or 0-9)

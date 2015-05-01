@@ -47,11 +47,15 @@
                             <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                         </button>
                         </a>
+
+                        {% if perms.MainApp.add_surat %}
                         <a href="{% url 'surat_tambah' %}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </button>
                         </a>
+                        {% endif %}
+
                         <a href="/surat_edit/{{ surat.no_surat }}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -74,11 +78,13 @@
                 {% else %}
                     <p>Tidak ada surat</p>
                     <p>
+                        {% if perms.MainApp.add_surat %}
                         <a href="{% url 'surat_tambah' %}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true">Tambah Surat</span>
                         </button>
                         </a>
+                        {% endif %}
                     </p>
                 {% endif %}
 

@@ -2,11 +2,21 @@ import  os
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User, Group, Permission
 
 from MainApp.models import Surat, Disposisi, UserProfile
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
+
+# untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
+def group_required(*group_names):
+    """Requires user membership in at least one of the groups passed in."""
+    def in_groups(u):
+        if u.is_authenticated():
+            if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
+                return True
+        return False
+    return user_passes_test(in_groups, login_url='/login')
 
 # Create your views here.
 def index(request):
@@ -16,11 +26,19 @@ def index(request):
 
 @login_required
 def surat(request):
+    context_dict = {}
+
+    user_saat_ini = request.user
+
+    # mengecek apakah user memiliki hak akses untuk menambahkan surat, bisa dari user permissions atau group permission
+    user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
 
     # get data surat
     semua_surat = Surat.objects.all()
 
-    context_dict = {'semua_surat': semua_surat, 'page_surat_active':'active'}
+    context_dict['semua_surat'] = semua_surat
+    context_dict['page_surat_active'] = 'active'
+
 
     return render(request, 'MainApp/surat.html', context_dict)
 
@@ -62,11 +80,12 @@ def surat_delete(request, no_surat):
     return render(request, 'MainApp/surat.html', context_dict)
 
 @login_required
+#@group_required('admin', 'pencatat surat')
 def surat_tambah(request):
+
+    # dapatkan data user yang sedang login
     user_saat_ini = request.user
     user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
-
-    # cek apakah user yang sedang login berhak mencatat surat
 
     # A HTTP POST?
     if request.method == 'POST':

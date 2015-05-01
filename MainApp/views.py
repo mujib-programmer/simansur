@@ -63,6 +63,10 @@ def surat_delete(request, no_surat):
 
 @login_required
 def surat_tambah(request):
+    user_saat_ini = request.user
+    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
+
+    # cek apakah user yang sedang login berhak mencatat surat
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -70,6 +74,9 @@ def surat_tambah(request):
 
         # Have we been provided with a valid form?
         if form.is_valid():
+            data_surat = form.save(commit=False)
+
+            data_surat.id_pencatat = user_profile_saat_ini # pencatat surat adalah user profile yang sedang login
 
             form.save(commit=True)
 

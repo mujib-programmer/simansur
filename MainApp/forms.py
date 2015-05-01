@@ -1,18 +1,24 @@
 from django import forms
+from django.forms.extras.widgets import SelectDateWidget
 from django.contrib.auth.models import User, Group
 from MainApp.models import Surat, Disposisi, UserProfile
+
+TINGKAT_KEPENTINGAN_SURAT_CHOICES = (
+    ('normal', 'normal'),
+    ('penting', 'penting'),
+)
 
 class SuratForm(forms.ModelForm):
     no_surat = forms.IntegerField(label='No Surat')
     no_agenda = forms.IntegerField(label='No Agenda')
     perihal_surat = forms.CharField(label='Perihal Surat')
-    tanggal_surat_masuk = forms.DateField(label='Tanggal Surat Masuk')
-    keterangan_disposisi = forms.CharField(label='Keterangan Disposisi')
-    tingkat_kepentingan = forms.CharField(label='Tingkat Kepentingan')
+    tanggal_surat_masuk = forms.DateField(label='Tanggal Surat Masuk', widget=SelectDateWidget())
+    #keterangan_disposisi = forms.CharField(label='Keterangan Disposisi')
+    tingkat_kepentingan = forms.ChoiceField(label='Tingkat Kepentingan', choices=TINGKAT_KEPENTINGAN_SURAT_CHOICES)
     dari = forms.CharField(label='Dari')
     #timestamp_surat = forms.DateTimeField()
     id_penerima = forms.ModelChoiceField(label='Penerima', queryset=UserProfile.objects.all())
-    id_pencatat = forms.ModelChoiceField(label='Pencatat', queryset=UserProfile.objects.all())
+    #id_pencatat = forms.ModelChoiceField(label='Pencatat', queryset=UserProfile.objects.all())
     file_surat = forms.FileField(label='File Surat')
 
 
@@ -21,6 +27,7 @@ class SuratForm(forms.ModelForm):
         # Provide an association between the ModelForm and a model
         model = Surat
         fields = ('no_surat', 'no_agenda','perihal_surat', 'tanggal_surat_masuk', 'keterangan_disposisi', 'tingkat_kepentingan', 'dari', 'id_penerima', 'id_pencatat', 'file_surat',)
+        exclude = ('id_pencatat','keterangan_disposisi',)
 
 
 class DisposisiForm(forms.ModelForm):

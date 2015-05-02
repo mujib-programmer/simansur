@@ -110,8 +110,12 @@ def surat_tambah(request):
             data_surat = form.save(commit=False)
 
             data_surat.id_pencatat = user_profile_saat_ini # pencatat surat adalah user profile yang sedang login
-
             form.save(commit=True)
+
+            # tambahkan pengirim dan penerima sebagai user terkait surat
+            data_surat.user_terkait.add(user_profile_saat_ini)
+            data_surat.user_terkait.add(data_surat.id_penerima)
+            data_surat.save()
 
             # go to surat view
             return surat(request)
@@ -192,6 +196,10 @@ def disposisi_tambah(request, no_surat):
 
             disposisi = form.save(commit=False)
             disposisi.surat = dataSurat
+
+            # tambahkan penerima disposisi sebagai user terkait surat
+            dataSurat.user_terkait.add(disposisi.penerima_disposisi)
+            dataSurat.save()
 
             form.save(commit=True)
 

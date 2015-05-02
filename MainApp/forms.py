@@ -27,7 +27,7 @@ class SuratForm(forms.ModelForm):
         # Provide an association between the ModelForm and a model
         model = Surat
         fields = ('no_surat', 'no_agenda','perihal_surat', 'tanggal_surat_masuk', 'keterangan_disposisi', 'tingkat_kepentingan', 'dari', 'id_penerima', 'id_pencatat', 'file_surat',)
-        exclude = ('id_pencatat','keterangan_disposisi', 'status_surat')
+        exclude = ('id_pencatat','keterangan_disposisi', 'status_surat', 'user_terkait',)
 
 
 class DisposisiForm(forms.ModelForm):

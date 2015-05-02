@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group, Permission
 
-from MainApp.models import Surat, Disposisi, UserProfile
+from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
@@ -439,6 +439,10 @@ def user_login(request):
                 # If the account is valid and active, we can log the user in.
                 # We'll send the user back to the homepage.
                 login(request, user)
+
+                # log aktivitas login
+                log_aktivitas(user, "%s login." % user.username)
+
                 return HttpResponseRedirect('/surat/')
             else:
                 # An inactive account was used - no logging in!
@@ -462,8 +466,18 @@ def user_login(request):
 # Use the login_required() decorator to ensure only those logged in can access the view.
 @login_required
 def user_logout(request):
+
+    log_aktivitas(request.user, "%s logout." % request.user.username)
+
     # Since we know the user is logged in, we can now just log them out.
     logout(request)
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/')
+
+def log_aktivitas(user, aktivitas):
+    # log aktivitas login
+    log_aktivitas = Aktivitas()
+    log_aktivitas.user = user
+    log_aktivitas.aktivitas = aktivitas
+    log_aktivitas.save()

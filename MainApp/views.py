@@ -29,12 +29,26 @@ def surat(request):
     context_dict = {}
 
     user_saat_ini = request.user
+    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
 
     # mengecek apakah user memiliki hak akses untuk menambahkan surat, bisa dari user permissions atau group permission
-    user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
+    #user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
 
-    # get data surat
-    semua_surat = Surat.objects.all()
+    # ambil data surat sesuai dengan yang login
+    # manajer surat akan bisa mendapatkan semua data surat
+    # pencatat surat hanya bisa mendapatkan data surat yang di catat olehnya
+    # penerima surat hanya bisa mendapatkan semua surat yang ditujukan kepadanya
+    if bool(user_saat_ini.groups.filter(name__in = ("manajer surat") ) ) | user_saat_ini.is_superuser: # pengecekan user has groups belum bekerja
+        # get data surat
+        semua_surat = Surat.objects.all()
+
+    else:
+        try:
+            # ambil semua surat yang terkait dengan user saja
+            semua_surat = Surat.objects.filter(id_pencatat=user_profile_saat_ini)
+
+        except Surat.DoesNotExist:
+            semua_surat = None
 
     context_dict['semua_surat'] = semua_surat
     context_dict['page_surat_active'] = 'active'

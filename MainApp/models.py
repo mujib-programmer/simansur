@@ -27,6 +27,7 @@ class Surat(models.Model):
     timestamp_surat = models.DateTimeField(null=True,auto_now_add=True)
     id_penerima = models.ForeignKey(UserProfile, null=True, related_name='id_penerima')
     id_pencatat = models.ForeignKey(UserProfile, null=True, related_name='id_pencatat')
+    status_surat = models.CharField(null=True, max_length=50) # baru, dikirim, dibaca, didisposisi, disposisi dibaca
     file_surat = models.FileField(upload_to=settings.UPLOAD_PATH, null=True, blank=True)
     
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
@@ -45,3 +46,9 @@ class Disposisi(models.Model):
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
     def __str__(self):
         return str( self.surat )
+
+class aktivitas(models.Model):
+    id = models.AutoField(primary_key=True)
+    timestamp = models.DateTimeField(null=True,auto_now_add=True)
+    user_profile = models.ForeignKey(UserProfile, null=True, related_name='user_profile')
+    aktivitas = models.CharField(null=False, max_length=255)

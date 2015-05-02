@@ -45,6 +45,10 @@
                     <td>{{ surat.tingkat_kepentingan }}</td>
                 </tr>
                 <tr>
+                    <td>Status Surat</td>
+                    <td>{{ surat.status_surat }}</td>
+                </tr>
+                <tr>
                     <td>File Surat</td>
                     <td><a href="{% url 'surat_download' no_surat=surat.no_surat %}">Download</a></td>
                 </tr>

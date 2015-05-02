@@ -475,6 +475,16 @@ def user_logout(request):
     # Take the user back to the homepage.
     return HttpResponseRedirect('/')
 
+@login_required
+def aktivitas(request):
+    aktivitas_user = Aktivitas.objects.all()
+
+    context_dict = {}
+    context_dict['aktivitas_user'] =  aktivitas_user
+    context_dict['page_aktivitas_active'] = 'active'
+
+    return render(request, "MainApp/aktivitas.html", context_dict)
+
 def log_aktivitas(user, aktivitas):
     # log aktivitas login
     log_aktivitas = Aktivitas()

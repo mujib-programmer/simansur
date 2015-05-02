@@ -28,4 +28,6 @@ urlpatterns = patterns('',
     url(r'^user_tambah/$', views.user_tambah, name='user_tambah'),
     url(r'^user_edit/(?P<username>[\w\-]+)/$', views.user_edit, name='user_edit'),
     url(r'^user_delete/(?P<username>[\w\-]+)/$', views.user_delete, name='user_delete'),
+
+    url(r'^aktivitas/$', views.aktivitas, name='aktivitas'),
 )

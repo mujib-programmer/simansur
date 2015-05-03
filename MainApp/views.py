@@ -35,17 +35,20 @@ def surat(request):
     #user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
 
     # ambil data surat sesuai dengan yang login
-    # manajer surat akan bisa mendapatkan semua data surat
-    # pencatat surat hanya bisa mendapatkan data surat yang di catat olehnya
-    # penerima surat hanya bisa mendapatkan semua surat yang ditujukan kepadanya
-    if bool(user_saat_ini.groups.filter(name__in = ("manajer surat") ) ) | user_saat_ini.is_superuser: # pengecekan user has groups belum bekerja
+    # manajer surat atau superadmin akan bisa mendapatkan semua data surat
+    if user_saat_ini.groups.filter(name='manager').exists() | user_saat_ini.is_superuser:
+
         # get data surat
         semua_surat = Surat.objects.all()
 
     else:
+
+        # pencatat surat hanya bisa mendapatkan data surat yang di catat olehnya
+        # penerima surat hanya bisa mendapatkan semua surat yang ditujukan kepadanya
         try:
             # ambil semua surat yang terkait dengan user saja
-            semua_surat = Surat.objects.filter(id_pencatat=user_profile_saat_ini)
+            # user terkait yaitu, pengirim surat, penerima surat, dan penerima disposisi
+            semua_surat = Surat.objects.filter(user_terkait=user_profile_saat_ini)
 
         except Surat.DoesNotExist:
             semua_surat = None

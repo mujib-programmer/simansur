@@ -9,8 +9,8 @@ TINGKAT_KEPENTINGAN_SURAT_CHOICES = (
 )
 
 class SuratForm(forms.ModelForm):
-    no_surat = forms.IntegerField(label='No Surat')
-    no_agenda = forms.IntegerField(label='No Agenda')
+    no_surat = forms.CharField(label='No Surat')
+    no_agenda = forms.CharField(label='No Agenda')
     perihal_surat = forms.CharField(label='Perihal Surat')
     tanggal_surat_masuk = forms.DateField(label='Tanggal Surat Masuk', widget=SelectDateWidget())
     #keterangan_disposisi = forms.CharField(label='Keterangan Disposisi')

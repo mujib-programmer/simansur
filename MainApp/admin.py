@@ -1,5 +1,5 @@
 from django.contrib import admin
-from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas
+from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat
 
 class SuratAdmin(admin.ModelAdmin):
     list_display = ('no_surat', 'no_agenda', 'perihal_surat', 'tanggal_surat_masuk', 
@@ -17,9 +17,12 @@ class UserProfileAdmin(admin.ModelAdmin):
 class AktivitasAdmin(admin.ModelAdmin):
     list_display = ('timestamp', 'user', 'aktivitas')
 
+class TrackSuratAdmin(admin.ModelAdmin):
+    list_display = ('timestamp', 'surat', 'status')
+
 # Register your models here.
 admin.site.register(Surat, SuratAdmin)
 admin.site.register(Disposisi, DisposisiAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Aktivitas, AktivitasAdmin)
-
+admin.site.register(TrackSurat, TrackSuratAdmin)

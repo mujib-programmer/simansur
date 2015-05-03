@@ -9,6 +9,8 @@ from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
+# user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
+"""
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
     def in_groups(u):
@@ -17,6 +19,7 @@ def group_required(*group_names):
                 return True
         return False
     return user_passes_test(in_groups, login_url='/login')
+"""
 
 # Create your views here.
 def index(request):

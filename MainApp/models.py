@@ -17,8 +17,8 @@ class UserProfile(models.Model):
 
 
 class Surat(models.Model):
-    no_surat = models.IntegerField(unique=True)
-    no_agenda = models.IntegerField(null=True)
+    no_surat = models.CharField(null=False, unique=True, max_length=15)    #IntegerField(unique=True)
+    no_agenda = models.CharField(null=False, max_length=15)   #IntegerField(null=True)
     perihal_surat = models.TextField(null=True,)
     tanggal_surat_masuk = models.DateField(null=True, auto_now_add=False)
     keterangan_disposisi = models.TextField(null=True)
@@ -33,7 +33,7 @@ class Surat(models.Model):
     
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
     def __str__(self):
-        return str( self.no_surat )
+        return self.no_surat
 
 class Disposisi(models.Model):
     id = models.AutoField(primary_key=True)
@@ -53,3 +53,8 @@ class Aktivitas(models.Model):
     timestamp = models.DateTimeField(null=True,auto_now_add=True)
     user = models.ForeignKey(User, null=True, related_name='user')
     aktivitas = models.CharField(null=False, max_length=255)
+
+class TrackSurat(models.Model):
+    surat = models.ForeignKey(Surat, null=False, related_name='surat_di_track_surat')
+    status = models.CharField(null=False, max_length=50)
+    timestamp = models.DateTimeField(null=True,auto_now_add=True)

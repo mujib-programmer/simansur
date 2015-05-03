@@ -30,4 +30,8 @@ urlpatterns = patterns('',
     url(r'^user_delete/(?P<username>[\w\-]+)/$', views.user_delete, name='user_delete'),
 
     url(r'^aktivitas/$', views.aktivitas, name='aktivitas'),
+
+    url(r'^statistik/$', views.statistik, name='statistik'),
+
+
 )

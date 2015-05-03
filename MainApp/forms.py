@@ -32,13 +32,13 @@ class SuratForm(forms.ModelForm):
 
 class DisposisiForm(forms.ModelForm):
     penerima_disposisi = forms.ModelChoiceField(label='Penerima Disposisi', queryset=UserProfile.objects.all())
-    pengirim_disposisi = forms.ModelChoiceField(label='Pengirim Disposisi', queryset=UserProfile.objects.all())
-    tanggal_surat_disposisi = forms.DateField(label='Tanggal Surat Disposisi')
+    #pengirim_disposisi = forms.ModelChoiceField(label='Pengirim Disposisi', queryset=UserProfile.objects.all())
+    tanggal_surat_disposisi = forms.DateField(label='Tanggal Surat Disposisi', widget=SelectDateWidget())
     catatan_tambahan = forms.CharField(label='Catatan Tambahan')
 
     class Meta:
         model = Disposisi
-        exclude = ('surat',)
+        exclude = ('surat', 'pengirim_disposisi',)
 
 class UserProfileForm(forms.Form):
     username = forms.SlugField(label="Username", max_length=30)

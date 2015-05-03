@@ -1,18 +1,21 @@
 import  os
+
+from datetime import datetime
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group, Permission
 
-from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas
+from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
 # user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
 """
 def group_required(*group_names):
-    """Requires user membership in at least one of the groups passed in."""
+    #Requires user membership in at least one of the groups passed in
     def in_groups(u):
         if u.is_authenticated():
             if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
@@ -116,12 +119,17 @@ def surat_tambah(request):
             data_surat = form.save(commit=False)
 
             data_surat.id_pencatat = user_profile_saat_ini # pencatat surat adalah user profile yang sedang login
+            status_surat = "Dikirim ke %s." % data_surat.id_penerima
+            data_surat.status_surat = status_surat
             form.save(commit=True)
 
             # tambahkan pengirim dan penerima sebagai user terkait surat
             data_surat.user_terkait.add(user_profile_saat_ini)
             data_surat.user_terkait.add(data_surat.id_penerima)
             data_surat.save()
+
+            # tambahkan status surat di track surat
+            catat_track_surat(data_surat, status_surat)
 
             # go to surat view
             return surat(request)
@@ -190,8 +198,12 @@ def surat_download(request, no_surat):
 @login_required
 def disposisi_tambah(request, no_surat):
 
+    # dapatkan data user yang sedang login
+    user_saat_ini = request.user
+    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
+
     # get data surat
-    dataSurat = Surat.objects.get(no_surat=no_surat)
+    data_surat = Surat.objects.get(no_surat=no_surat)
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -201,12 +213,28 @@ def disposisi_tambah(request, no_surat):
         if form.is_valid():
 
             disposisi = form.save(commit=False)
-            disposisi.surat = dataSurat
+            disposisi.surat = data_surat
+
+            # catat pengirim disposisi dari user yang login saat ini
+            disposisi.pengirim_disposisi = user_profile_saat_ini
 
             # tambahkan penerima disposisi sebagai user terkait surat
-            dataSurat.user_terkait.add(disposisi.penerima_disposisi)
-            dataSurat.save()
+            data_surat.user_terkait.add(disposisi.penerima_disposisi)
 
+            # ubah status surat
+            status_surat = "Didisposisi ke %s." % disposisi.penerima_disposisi
+            data_surat.status_surat = status_surat
+
+            # ubah keterangan disposisi surat sesuai catatan tambahan disposisi saat ini
+            data_surat.keterangan_disposisi = disposisi.catatan_tambahan
+
+            # simpan surat
+            data_surat.save()
+
+            # tambahkan status surat di track surat
+            catat_track_surat(data_surat, status_surat)
+
+            # simpan data disposisi
             form.save(commit=True)
 
             # go to surat view
@@ -499,9 +527,34 @@ def aktivitas(request):
 
     return render(request, "MainApp/aktivitas.html", context_dict)
 
+@login_required
+def statistik(request):
+    current_month = datetime.now().month
+
+    surat_bulan_ini = Surat.objects.filter(tanggal_surat_masuk__month=current_month)
+
+    data_statistik_surat = "Jumlah surat yang dikirim bulan %s tahun %s = %s." \
+                           % (str(datetime.now().month) , str(datetime.now().year), str(surat_bulan_ini.count()) )
+
+    context_dict = {'data_statistik_surat': data_statistik_surat}
+
+
+    return render(request, "MainApp/statistik.html", context_dict)
+
+
+"""
+Daftar method yang dipanggil oleh method lain dalam views
+"""
+
 def log_aktivitas(user, aktivitas):
     # log aktivitas login
     log_aktivitas = Aktivitas()
     log_aktivitas.user = user
     log_aktivitas.aktivitas = aktivitas
     log_aktivitas.save()
+
+def catat_track_surat(surat, status_surat):
+    trackSurat = TrackSurat()
+    trackSurat.surat = surat
+    trackSurat.status = status_surat
+    trackSurat.save()

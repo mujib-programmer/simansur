@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Statistik Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                {{ data_statistik_surat }}
+            </div>
+        </div>
+
+{% endblock %}

@@ -34,6 +34,7 @@ def index(request):
 def surat(request):
     context_dict = {}
 
+    # mendapatkan user profile yang sedang login
     user_saat_ini = request.user
     user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
 
@@ -470,6 +471,7 @@ def user_login(request):
 
         # Use Django's machinery to attempt to see if the username/password
         # combination is valid - a User object is returned if it is.
+
         user = authenticate(username=username, password=password)
 
         # If we have a User object, the details are correct.

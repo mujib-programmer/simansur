@@ -26,6 +26,7 @@ class Surat(models.Model):
     dari = models.TextField(null=True)
     timestamp_surat = models.DateTimeField(null=True,auto_now_add=True)
     id_penerima = models.ForeignKey(UserProfile, null=True, related_name='id_penerima')
+    # penerima_terakhir =  # untuk mengubah status surat dari dikirimkan menjadi dibaca ketika surat detail diakses oleh penerima terakhir saja.
     id_pencatat = models.ForeignKey(UserProfile, null=True, related_name='id_pencatat')
     user_terkait = models.ManyToManyField(UserProfile, null=True, related_name='user_terkait')
     status_surat = models.CharField(null=True, max_length=50) # baru, dikirim, dibaca, didisposisi, disposisi dibaca
@@ -42,7 +43,7 @@ class Disposisi(models.Model):
     pengirim_disposisi = models.ForeignKey(UserProfile, null=True, related_name='pengirim_disposisi')
     catatan_tambahan = models.CharField(max_length=25)
     timestamp_disposisi = models.DateTimeField(auto_now_add=True)
-    tanggal_surat_disposisi = models.DateField(auto_now_add=False)
+    tanggal_surat_disposisi = models.DateField(auto_now_add=False) # dihapus karena sudah tercatat timestamp saat disposisi dikirimkan
     
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
     def __str__(self):

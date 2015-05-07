@@ -81,12 +81,12 @@
               </table>
 
                 {% else %}
-                    <p>Tidak ada surat</p>
+                    <p>Tidak ada surat di kotak surat</p>
                     <p>
                         {% if perms.MainApp.add_surat %}
                         <a href="{% url 'surat_tambah' %}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
-                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true">Tambah Surat</span>
+                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"> Label Surat Baru</span>
                         </button>
                         </a>
                         {% endif %}

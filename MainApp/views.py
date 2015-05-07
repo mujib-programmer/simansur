@@ -8,11 +8,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group, Permission
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
-from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat
+from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
 
-DATA_PER_HALAMAN = 2
+DATA_PER_HALAMAN = 2 # untuk pagination
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
 # user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
@@ -27,7 +28,6 @@ def group_required(*group_names):
     return user_passes_test(in_groups, login_url='/login')
 """
 
-# Create your views here.
 def index(request):
     context_dict = {'slug': 'login', 'page_home_active':'active'}
 
@@ -35,42 +35,33 @@ def index(request):
 
 @login_required
 def surat(request):
-    context_dict = {}
+    # data untuk di tampilkan di template
+    data = {}
 
-    # mendapatkan user profile yang sedang login
+    # user yang sedang login
     user_saat_ini = request.user
 
-    # mengecek apakah user memiliki hak akses untuk menambahkan surat, bisa dari user permissions atau group permission
-    #user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
-
-    semua_surat = Surat.objects.all()
-
-    """
     # ambil data surat sesuai dengan yang login
-    # manajer surat atau superadmin akan bisa mendapatkan semua data surat
-    if user_saat_ini.groups.filter(name='manajer').exists() | user_saat_ini.is_superuser:
-
-        # get data surat
-        semua_surat = Surat.objects.all()
+    if user_dalam_group(user_saat_ini, 'manajer') | user_saat_ini.is_superuser:
+        # manajer surat atau superadmin akan bisa mendapatkan semua data surat
+        semua_surat = KotakSurat.objects.all()
 
     else:
-
-        # pencatat surat hanya bisa mendapatkan data surat yang di catat olehnya
-        # penerima surat hanya bisa mendapatkan semua surat yang ditujukan kepadanya
+        # selain admin atau manajer hanya akan mendapatkan data surat yang ditujukan atau di dikirim olehnya
         try:
             # ambil semua surat yang terkait dengan user saja
             # user terkait yaitu, pengirim surat, penerima surat, dan penerima disposisi
-            semua_surat = Surat.objects.filter(user_terkait=user_profile_saat_ini)
+            semua_surat = KotakSurat.objects.filter(Q(pengirim=user_saat_ini) | Q(penerima=user_saat_ini))
 
         except Surat.DoesNotExist:
             semua_surat = None
-    """
-
-    context_dict['semua_surat'] = semua_surat
-    context_dict['page_surat_active'] = 'active'
 
 
-    return render(request, 'MainApp/surat.html', context_dict)
+    data['semua_surat'] = semua_surat
+    data['page_surat_active'] = 'active'
+
+
+    return render(request, 'MainApp/surat/surat.html', data)
 
 @login_required
 def surat_detail(request, no_surat):
@@ -111,11 +102,18 @@ def surat_delete(request, no_surat):
 
 @login_required
 #@group_required('admin', 'pencatat surat')
+# tambah surat artinya melabeli surat baru, belum mengirimkannya.
 def surat_tambah(request):
+    data = {}
 
     # dapatkan data user yang sedang login
     user_saat_ini = request.user
-    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
+    
+    # Hanya user yang memiliki hak akses untuk menambah surat diperbolehkan untuk melabeli surat baru
+    if user_saat_ini.has_perm('MainApp.add_surat') == False :
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Anda tidak di ijinkan untuk menambah label surat baru!"
+        return render(request, "MainApp/index.html", data)
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -125,21 +123,12 @@ def surat_tambah(request):
         if form.is_valid():
             data_surat = form.save(commit=False)
 
-            data_surat.id_pencatat = user_profile_saat_ini # pencatat surat adalah user profile yang sedang login
-            status_surat = "Dikirim ke %s." % data_surat.id_penerima
-            data_surat.status_surat = status_surat
+            data_surat.pencatat = user_saat_ini # pencatat surat adalah user profile yang sedang loginstatus_surat
+            data_surat.dihapus = "tidak"
             form.save(commit=True)
 
-            # tambahkan pengirim dan penerima sebagai user terkait surat
-            data_surat.user_terkait.add(user_profile_saat_ini)
-            data_surat.user_terkait.add(data_surat.id_penerima)
-            data_surat.save()
-
-            # tambahkan status surat di track surat
-            catat_track_surat(data_surat, status_surat)
-
-            # go to surat view
-            return surat(request)
+            # kembali ke halaman daftar surat
+            return HttpResponseRedirect('/surat/')
         else:
             # The supplied form contained errors - just print them to the terminal.
             print(form.errors)
@@ -149,7 +138,7 @@ def surat_tambah(request):
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render(request, 'MainApp/surat_tambah.html', {'form': form, 'page_surat_active':'active'})
+    return render(request, 'MainApp/surat/surat_tambah.html', {'form': form, 'page_surat_active':'active'})
 
 @login_required
 def surat_edit(request, no_surat):
@@ -663,4 +652,7 @@ def catat_track_surat(surat, status_surat):
 
 def is_admin(user):
     return user.groups.filter(name='admin').exists()
+
+def user_dalam_group(user, nama_group):
+    return user.groups.filter(name=nama_group).exists()
 

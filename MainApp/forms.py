@@ -11,23 +11,15 @@ TINGKAT_KEPENTINGAN_SURAT_CHOICES = (
 class SuratForm(forms.ModelForm):
     no_surat = forms.CharField(label='No Surat')
     no_agenda = forms.CharField(label='No Agenda')
-    perihal_surat = forms.CharField(label='Perihal Surat')
+    perihal = forms.CharField(label='Perihal Surat')
     tanggal_surat_masuk = forms.DateField(label='Tanggal Surat Masuk', widget=SelectDateWidget())
-    #keterangan_disposisi = forms.CharField(label='Keterangan Disposisi')
+    pengirim_surat_fisik = forms.CharField(label='Pengirim Surat Fisik')
     tingkat_kepentingan = forms.ChoiceField(label='Tingkat Kepentingan', choices=TINGKAT_KEPENTINGAN_SURAT_CHOICES)
-    dari = forms.CharField(label='Dari')
-    #timestamp_surat = forms.DateTimeField()
-    id_penerima = forms.ModelChoiceField(label='Penerima', queryset=UserProfile.objects.all())
-    #id_pencatat = forms.ModelChoiceField(label='Pencatat', queryset=UserProfile.objects.all())
     file_surat = forms.FileField(label='File Surat')
 
-
-    # An inline class to provide additional information on the form.
     class Meta:
-        # Provide an association between the ModelForm and a model
         model = Surat
-        fields = ('no_surat', 'no_agenda','perihal_surat', 'tanggal_surat_masuk', 'keterangan_disposisi', 'tingkat_kepentingan', 'dari', 'id_penerima', 'id_pencatat', 'file_surat',)
-        exclude = ('id_pencatat','keterangan_disposisi', 'status_surat', 'user_terkait',)
+        exclude = ('pencatat','tanggal_pencatatan', 'dihapus')
 
 
 class DisposisiForm(forms.ModelForm):

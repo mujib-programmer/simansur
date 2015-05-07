@@ -43,6 +43,9 @@ def surat(request):
     # mengecek apakah user memiliki hak akses untuk menambahkan surat, bisa dari user permissions atau group permission
     #user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')
 
+    semua_surat = Surat.objects.all()
+
+    """
     # ambil data surat sesuai dengan yang login
     # manajer surat atau superadmin akan bisa mendapatkan semua data surat
     if user_saat_ini.groups.filter(name='manajer').exists() | user_saat_ini.is_superuser:
@@ -61,6 +64,7 @@ def surat(request):
 
         except Surat.DoesNotExist:
             semua_surat = None
+    """
 
     context_dict['semua_surat'] = semua_surat
     context_dict['page_surat_active'] = 'active'
@@ -296,6 +300,14 @@ def disposisi_delete(request, no_surat, id_disposisi):
 
 @login_required
 def user(request):
+    data = {}
+
+    # hanya admin yang bisa melihat daftar user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk melihat daftar user!"
+        return render(request, "MainApp/index.html", data)
+
     semua_user_profile = UserProfile.objects.all()
 
     paginator = Paginator(semua_user_profile, DATA_PER_HALAMAN)
@@ -315,7 +327,15 @@ def user(request):
 
     return render(request, 'MainApp/user/user.html', data)
 
+@login_required
 def user_detail(request, username):
+    data = {}
+
+    # hanya admin yang bisa melihat detail user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk melihat detail user!"
+        return render(request, "MainApp/index.html", data)
 
     try:
         # get data user
@@ -334,6 +354,13 @@ def user_detail(request, username):
 
 @login_required
 def user_tambah(request):
+    data = {}
+
+    # hanya admin yang bisa menambah user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk menambah data user!"
+        return render(request, "MainApp/index.html", data)
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -398,6 +425,13 @@ def user_tambah(request):
 
 @login_required
 def user_edit(request, username):
+    data = {}
+
+    # hanya admin yang bisa mengedit user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk mengubah data user!"
+        return render(request, "MainApp/index.html", data)
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -473,6 +507,13 @@ def user_edit(request, username):
 
 @login_required
 def user_delete(request, username):
+    data = {}
+
+    # hanya admin yang bisa menghapus user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk menghapus user!"
+        return render(request, "MainApp/index.html", data)
 
     try:
         # get user
@@ -556,6 +597,14 @@ def user_logout(request):
 
 @login_required
 def aktivitas(request):
+    data = {}
+
+    # hanya admin yang bisa melihat aktivitas user
+    if is_admin(request.user) == False:
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Hanya administrator yang dijinkan untuk mengakses halaman log aktivitas!"
+        return render(request, "MainApp/index.html", data)
+
     semua_aktivitas_user = Aktivitas.objects.all()
 
     paginator = Paginator(semua_aktivitas_user, DATA_PER_HALAMAN)
@@ -573,7 +622,7 @@ def aktivitas(request):
     jumlah_data_sebelumnya  = (aktivitas_user.number - 1) * DATA_PER_HALAMAN
 
 
-    data = {}
+
     data['aktivitas_user'] =  aktivitas_user
     data['page_aktivitas_active'] = 'active'
     data['jumlah_data_sebelumnya'] = jumlah_data_sebelumnya

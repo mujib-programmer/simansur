@@ -32,7 +32,7 @@
                 <tbody>
                 {% for user_profile in semua_user_profile %}
                   <tr>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ forloop.counter|add:jumlah_data_sebelumnya }}</td>
                     <td>{{ user_profile.user.username }}</td>
                     <td>{{ user_profile.user.email }}</td>
                     <td>
@@ -75,6 +75,22 @@
 
                 </tbody>
               </table>
+
+              <div class="pagination">
+                    <span class="step-links">
+                        {% if semua_user_profile.has_previous %}
+                            <a href="?page={{ semua_user_profile.previous_page_number }}"> Sebelumnya </a>
+                        {% endif %}
+
+                        <span class="current">
+                            Halaman {{ semua_user_profile.number }} dari {{ semua_user_profile.paginator.num_pages }} halaman.
+                        </span>
+
+                        {% if semua_user_profile.has_next %}
+                            <a href="?page={{ semua_user_profile.next_page_number }}"> Berikutnya </a>
+                        {% endif %}
+                    </span>
+              </div>
 
                 {% else %}
                  <p>

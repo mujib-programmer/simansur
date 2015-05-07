@@ -7,9 +7,12 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group, Permission
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
+
+DATA_PER_HALAMAN = 2
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
 # user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
@@ -42,7 +45,7 @@ def surat(request):
 
     # ambil data surat sesuai dengan yang login
     # manajer surat atau superadmin akan bisa mendapatkan semua data surat
-    if user_saat_ini.groups.filter(name='manager').exists() | user_saat_ini.is_superuser:
+    if user_saat_ini.groups.filter(name='manajer').exists() | user_saat_ini.is_superuser:
 
         # get data surat
         semua_surat = Surat.objects.all()
@@ -293,13 +296,24 @@ def disposisi_delete(request, no_surat, id_disposisi):
 
 @login_required
 def user(request):
-
-    # get data surat
     semua_user_profile = UserProfile.objects.all()
 
-    context_dict = {'semua_user_profile': semua_user_profile, 'page_user_active':'active'}
+    paginator = Paginator(semua_user_profile, DATA_PER_HALAMAN)
 
-    return render(request, 'MainApp/user.html', context_dict)
+    page = request.GET.get('page')
+    try:
+        user_profile = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        user_profile = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        user_profile = paginator.page(paginator.num_pages)
+
+    jumlah_data_sebelumnya  = (user_profile.number - 1) * DATA_PER_HALAMAN
+    data = {'semua_user_profile': user_profile, 'page_user_active':'active', 'jumlah_data_sebelumnya': jumlah_data_sebelumnya }
+
+    return render(request, 'MainApp/user/user.html', data)
 
 def user_detail(request, username):
 
@@ -314,9 +328,9 @@ def user_detail(request, username):
     except Disposisi.DoesNotExist:
          user_profile = None
 
-    context_dict = {'user_profile': user_profile, 'page_user_active':'active'}
+    data = {'user_profile': user_profile, 'page_user_active':'active'}
 
-    return render(request, 'MainApp/user_detail.html', context_dict)
+    return render(request, 'MainApp/user/user_detail.html', data)
 
 @login_required
 def user_tambah(request):
@@ -350,6 +364,18 @@ def user_tambah(request):
                 for group in groups_terpilih:
                     user_baru.groups.add(group)
 
+                 # jika user adalah admin, tandai user sebagai super admin di django
+                if is_admin(user_baru):
+                    user_baru.is_superuser = True
+                    user_baru.is_staff = True
+                else:
+                    user_baru.is_superuser = False
+                    user_baru.is_staff = False
+
+                # simpan kembali data user
+                user_baru.save()
+
+
                 # membuat user profile baru
                 user_profile_baru = UserProfile(user=user_baru)
                 user_profile_baru.bidang = data_form.get('bidang')
@@ -358,10 +384,8 @@ def user_tambah(request):
                 user_profile_baru.role_pencatat = False
                 user_profile_baru.save()
 
-                #form.save(commit=false)
-
-                # go to surat view
-                return user(request)
+                # kembali ke daftar user
+                return HttpResponseRedirect('/user/')
 
         else:
             # The supplied form contained errors - just print them to the terminal.
@@ -370,7 +394,7 @@ def user_tambah(request):
         # If the request was not a POST, display the form to enter details.
         form = UserProfileForm()
 
-    return render(request, 'MainApp/user_tambah.html', {'form': form, 'page_user_active':'active'})
+    return render(request, 'MainApp/user/user_tambah.html', {'form': form, 'page_user_active':'active'})
 
 @login_required
 def user_edit(request, username):
@@ -383,7 +407,7 @@ def user_edit(request, username):
         if form.is_valid():
             data_form = form.cleaned_data
 
-            # membuat object user
+            # mendapatkan object user yang akan diubah
             data_user = User.objects.get(username=username)
             data_user.email = data_form.get('email')
             data_user.set_password(data_form.get('password'))
@@ -400,7 +424,18 @@ def user_edit(request, username):
             for group in groups_terpilih:
                 data_user.groups.add(group)
 
-            # membuat user profile baru
+            # jika user adalah admin, tandai user sebagai super admin di django
+            if is_admin(data_user):
+                data_user.is_superuser = True
+                data_user.is_staff = True
+            else:
+                data_user.is_superuser = False
+                data_user.is_staff = False
+
+            # simpan kembali data user
+            data_user.save()
+
+            # mendapatkan object user profile sesuai user yang dipilih
             data_user_profile = UserProfile.objects.get(user=data_user)
             data_user_profile.bidang = data_form.get('bidang')
             data_user_profile.jabatan = data_form.get('jabatan')
@@ -408,8 +443,8 @@ def user_edit(request, username):
             data_user_profile.role_pencatat = False
             data_user_profile.save()
 
-            # go to surat view
-            return user(request)
+            # kembali ke daftar user
+            return HttpResponseRedirect('/user/')
 
         else:
             # The supplied form contained errors - just print them to the terminal.
@@ -434,7 +469,7 @@ def user_edit(request, username):
 
         form = UserProfileForm(initial=initial)
 
-    return render(request, 'MainApp/user_edit.html', {'form': form ,'username': username, 'page_user_active':'active'})
+    return render(request, 'MainApp/user/user_edit.html', {'form': form ,'username': username, 'page_user_active':'active'})
 
 @login_required
 def user_delete(request, username):
@@ -452,7 +487,8 @@ def user_delete(request, username):
     except User.DoesNotExist:
         pass
 
-    return user(request)
+    # kembali ke daftar user
+    return HttpResponseRedirect('/user/')
 
 def user_login(request):
 
@@ -520,13 +556,29 @@ def user_logout(request):
 
 @login_required
 def aktivitas(request):
-    aktivitas_user = Aktivitas.objects.all()
+    semua_aktivitas_user = Aktivitas.objects.all()
 
-    context_dict = {}
-    context_dict['aktivitas_user'] =  aktivitas_user
-    context_dict['page_aktivitas_active'] = 'active'
+    paginator = Paginator(semua_aktivitas_user, DATA_PER_HALAMAN)
 
-    return render(request, "MainApp/aktivitas.html", context_dict)
+    page = request.GET.get('page')
+    try:
+        aktivitas_user = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        aktivitas_user = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        aktivitas_user = paginator.page(paginator.num_pages)
+
+    jumlah_data_sebelumnya  = (aktivitas_user.number - 1) * DATA_PER_HALAMAN
+
+
+    data = {}
+    data['aktivitas_user'] =  aktivitas_user
+    data['page_aktivitas_active'] = 'active'
+    data['jumlah_data_sebelumnya'] = jumlah_data_sebelumnya
+
+    return render(request, "MainApp/aktivitas/aktivitas.html", data)
 
 @login_required
 def statistik(request):
@@ -559,3 +611,7 @@ def catat_track_surat(surat, status_surat):
     trackSurat.surat = surat
     trackSurat.status = status_surat
     trackSurat.save()
+
+def is_admin(user):
+    return user.groups.filter(name='admin').exists()
+

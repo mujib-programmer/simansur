@@ -42,7 +42,7 @@ class DisposisiForm(forms.ModelForm):
 
 class UserProfileForm(forms.Form):
     username = forms.SlugField(label="Username", max_length=30)
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password = forms.CharField(label="Password", widget = forms.PasswordInput(render_value = True))
     email = forms.EmailField(label="Email")
     groups = forms.ModelMultipleChoiceField(label="Groups", queryset=Group.objects.all())
     first_name = forms.CharField(label="Nama Depan", max_length=30)

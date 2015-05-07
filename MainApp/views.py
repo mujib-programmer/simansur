@@ -36,7 +36,6 @@ def surat(request):
 
     # mendapatkan user profile yang sedang login
     user_saat_ini = request.user
-    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
 
     # mengecek apakah user memiliki hak akses untuk menambahkan surat, bisa dari user permissions atau group permission
     #user_can_add_surat = user_saat_ini.has_perm('MainApp.add_surat')

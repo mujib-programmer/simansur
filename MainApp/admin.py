@@ -1,27 +1,28 @@
 from django.contrib import admin
-from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat
+from MainApp.models import Surat, KotakSurat, Disposisi, UserProfile, Aktivitas, TrackSurat
 
 class SuratAdmin(admin.ModelAdmin):
-    list_display = ('no_surat', 'no_agenda', 'perihal_surat', 'tanggal_surat_masuk', 
-                    'keterangan_disposisi', 'tingkat_kepentingan', 'dari', 
-                    'timestamp_surat', 'id_penerima', 'id_pencatat')
+    list_display = ('no_surat', 'no_agenda', 'perihal', 'tanggal_surat_masuk', 'pengirim_surat_fisik',
+                    'tingkat_kepentingan', 'file_surat', 'pencatat', 'tanggal_pencatatan', 'dihapus')
 
+class KotakSuratAdmin(admin.ModelAdmin):
+    list_display = ('id', 'surat', 'pengirim', 'penerima', 'status', 'catatan_tambahan', 'jenis_pengiriman', 'tanggal')
 
 class DisposisiAdmin(admin.ModelAdmin):
-    list_display = ('penerima_disposisi', 'surat', 'pengirim_disposisi',
-                    'catatan_tambahan', 'timestamp_disposisi', 'tanggal_surat_disposisi')
+    list_display = ('id', 'surat', 'pengirim', 'penerima', 'status', 'keterangan_disposisi', 'tanggal')
     
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bidang', 'jabatan', 'role_pencatat', 'no_telepon')
+    list_display = ('user', 'bidang', 'jabatan', 'no_telepon')
 
 class AktivitasAdmin(admin.ModelAdmin):
-    list_display = ('timestamp', 'user', 'aktivitas')
+    list_display = ('id', 'tanggal','user','aktivitas')
 
 class TrackSuratAdmin(admin.ModelAdmin):
-    list_display = ('timestamp', 'surat', 'status')
+    list_display = ('id', 'surat', 'tanggal', 'status')
 
 # Register your models here.
 admin.site.register(Surat, SuratAdmin)
+admin.site.register(KotakSurat, KotakSuratAdmin)
 admin.site.register(Disposisi, DisposisiAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Aktivitas, AktivitasAdmin)

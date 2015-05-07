@@ -23,7 +23,7 @@ class Surat(models.Model):
     file_surat = models.FileField(upload_to=settings.UPLOAD_PATH, null=True, blank=True)
     pencatat = models.ForeignKey(User, null=True, related_name='pencatat_surat')
     tanggal_pencatatan = models.DateTimeField(null=True,auto_now_add=True)
-    dihapus = models.CharField(null=True, max_length=5) # ya/tidak
+    status = models.CharField(null=True, max_length=15) # dilabeli, dikirim, dihapus
 
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3
     def __str__(self):
@@ -35,9 +35,9 @@ class KotakSurat(models.Model):
     surat = models.ForeignKey(Surat, null=False, related_name='surat_kotak_surat')
     pengirim = models.ForeignKey(User, null=True, related_name='pengirim_kotak_surat')
     penerima = models.ForeignKey(User, null=True, related_name='penerima_kotak_surat')
-    status = models.CharField(null=True, max_length=15)
+    status = models.CharField(null=True, max_length=15) # diterima, dibaca, didisposisi
     catatan_tambahan = models.TextField(null=True)
-    jenis_pengiriman = models.CharField(null=False, max_length=15)
+    jenis_pengiriman = models.CharField(null=False, max_length=15) # langsung, disposisi
     tanggal = models.DateTimeField(auto_now_add=True)
 
     #def __unicode__(self):  #For Python 2, use __str__ on Python 3

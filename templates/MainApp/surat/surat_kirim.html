@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Detail Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {% if surat %}
+
+              <table class="table">
+                <tbody>
+                <tr>
+                    <td>Tanggal Surat</td>
+                    <td>{{ surat.tanggal_surat_masuk }}</td>
+                </tr>
+                <tr>
+                    <td>No Surat</td>
+                    <td>{{ surat.no_surat }}</td>
+                </tr>
+                <tr>
+                    <td>No Agenda</td>
+                    <td>{{ surat.no_agenda }}</td>
+                </tr>
+                <tr>
+                    <td>Perihal</td>
+                    <td>{{ surat.perihal }}</td>
+                </tr>
+                <tr>
+                    <td>Pengirim Surat Fisik</td>
+                    <td>{{ surat.pengirim_surat_fisik }}</td>
+                </tr>
+                <tr>
+                    <td>Tingkat Kepentingan</td>
+                    <td>{{ surat.tingkat_kepentingan }}</td>
+                </tr>
+                <tr>
+                    <td>Status Surat</td>
+                    <td>{{ surat.status }}</td>
+                </tr>
+                <tr>
+                    <td>File Surat</td>
+                    <td><a href="{% url 'surat_download' no_surat=surat.no_surat %}">Download</a></td>
+                </tr>
+                </tbody>
+              </table>
+
+                {% else %}
+                    <p>Surat yang diminta tidak ditemukan</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <br /> <br />
+
+        <div class="page-header">
+            <h2>Form Kirim Surat</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <form class="form-horizontal" role="form" id="kirim_surat_form" method="post" action="/surat_kirim/{{ no_surat }}/" enctype="multipart/form-data">
+
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                {% for field in form.visible_fields %}
+
+                    <div class="form-group">
+                        {{ field.errors }}
+                        {{ field.help_text }}
+                        <label class="control-label col-sm-2">{{ field.label }} </label>
+                        <div class="col-sm-10"> {{ field }} </div>
+                    </div>
+                {% endfor %}
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <input type="submit" name="submit" value="Kirim Surat" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+{% endblock %}

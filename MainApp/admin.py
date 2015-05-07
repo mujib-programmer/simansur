@@ -3,7 +3,7 @@ from MainApp.models import Surat, KotakSurat, Disposisi, UserProfile, Aktivitas,
 
 class SuratAdmin(admin.ModelAdmin):
     list_display = ('no_surat', 'no_agenda', 'perihal', 'tanggal_surat_masuk', 'pengirim_surat_fisik',
-                    'tingkat_kepentingan', 'file_surat', 'pencatat', 'tanggal_pencatatan', 'dihapus')
+                    'tingkat_kepentingan', 'file_surat', 'pencatat', 'tanggal_pencatatan', 'status')
 
 class KotakSuratAdmin(admin.ModelAdmin):
     list_display = ('id', 'surat', 'pengirim', 'penerima', 'status', 'catatan_tambahan', 'jenis_pengiriman', 'tanggal')

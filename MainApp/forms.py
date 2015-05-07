@@ -19,7 +19,7 @@ class SuratForm(forms.ModelForm):
 
     class Meta:
         model = Surat
-        exclude = ('pencatat','tanggal_pencatatan', 'dihapus')
+        exclude = ('pencatat','tanggal_pencatatan', 'status')
 
 
 class DisposisiForm(forms.ModelForm):
@@ -43,6 +43,10 @@ class UserProfileForm(forms.Form):
     jabatan = forms.CharField(label="Jabatan", max_length=40)
     bidang = forms.CharField(label="Bidang", max_length=40)
     no_telepon = forms.IntegerField(label="No Telepon")
+
+class KirimSuratForm(forms.Form):
+    penerima = forms.ModelChoiceField(label='Penerima Surat', queryset=User.objects.all())
+    catatan_tambahan = forms.CharField(label="Catatan Tambahan", widget=forms.Textarea)
 
 
 

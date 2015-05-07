@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
-from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm
+from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm
 
 DATA_PER_HALAMAN = 2 # untuk pagination
 
@@ -44,14 +44,14 @@ def surat(request):
     # ambil data surat sesuai dengan yang login
     if user_dalam_group(user_saat_ini, 'manajer') | user_saat_ini.is_superuser:
         # manajer surat atau superadmin akan bisa mendapatkan semua data surat
-        semua_surat = KotakSurat.objects.all()
+        semua_surat = Surat.objects.all()
 
     else:
         # selain admin atau manajer hanya akan mendapatkan data surat yang ditujukan atau di dikirim olehnya
         try:
             # ambil semua surat yang terkait dengan user saja
             # user terkait yaitu, pengirim surat, penerima surat, dan penerima disposisi
-            semua_surat = KotakSurat.objects.filter(Q(pengirim=user_saat_ini) | Q(penerima=user_saat_ini))
+            semua_surat = Surat.objects.filter(pencatat=user_saat_ini)
 
         except Surat.DoesNotExist:
             semua_surat = None
@@ -78,14 +78,29 @@ def surat_detail(request, no_surat):
 
     context_dict = {'surat': dataSurat, 'semua_disposisi_surat': semua_disposisi_surat, 'page_surat_active':'active'}
 
-    return render(request, 'MainApp/surat_detail.html', context_dict)
+    return render(request, 'MainApp/surat/surat_detail.html', context_dict)
 
 @login_required
 def surat_delete(request, no_surat):
+    data = {}
+
+    user_saat_ini = request.user
+
+    # Hanya user yang memiliki hak akses untuk menghapus surat diperbolehkan untuk menghapus label surat
+    if user_saat_ini.has_perm('MainApp.delete_surat') == False :
+        data['alert_type'] =  "danger"
+        data['alert_message'] = "Anda tidak di ijinkan untuk menghapus label surat!"
+        return render(request, "MainApp/index.html", data)
 
     try:
         # get data surat
         dataSurat = Surat.objects.get(no_surat=no_surat)
+
+        # hanya surat yang belum dikirim atau didisposisi yang bisa dihapus
+        if dataSurat.status != "dilabeli":
+            data['alert_type'] =  "danger"
+            data['alert_message'] = "Hanya surat yang belum dikirimkan atau didisposisikan yang bisa dihapus!"
+            return render(request, "MainApp/index.html", data)
 
         dataSurat.delete()
 
@@ -98,7 +113,7 @@ def surat_delete(request, no_surat):
 
     context_dict = {'semua_surat': semua_surat, 'page_surat_active':'active'}
 
-    return render(request, 'MainApp/surat.html', context_dict)
+    return render(request, 'MainApp/surat/surat.html', context_dict)
 
 @login_required
 #@group_required('admin', 'pencatat surat')
@@ -123,8 +138,8 @@ def surat_tambah(request):
         if form.is_valid():
             data_surat = form.save(commit=False)
 
-            data_surat.pencatat = user_saat_ini # pencatat surat adalah user profile yang sedang loginstatus_surat
-            data_surat.dihapus = "tidak"
+            data_surat.pencatat = user_saat_ini
+            data_surat.status = "dilabeli"
             form.save(commit=True)
 
             # kembali ke halaman daftar surat
@@ -167,7 +182,7 @@ def surat_edit(request, no_surat):
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render(request, 'MainApp/surat_edit.html', {'form': form ,'no_surat': no_surat, 'page_surat_active':'active'})
+    return render(request, 'MainApp/surat/surat_edit.html', {'form': form ,'no_surat': no_surat, 'page_surat_active':'active'})
 
 @login_required
 def surat_download(request, no_surat):
@@ -190,6 +205,60 @@ def surat_download(request, no_surat):
 
         # jika data surat yang diinginkan untuk dihapus tidak ditemukan, tampilkan daftar semua surat
         return surat_detail(request, no_surat)
+
+@login_required
+def surat_kirim(request, no_surat):
+    data = {}
+
+    user_saat_ini = request.user
+
+    # get data surat
+    data_surat = Surat.objects.get(no_surat=no_surat)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = KirimSuratForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+
+            data_form = form.cleaned_data
+
+            # tambahkan data kotak surat untuk user penerima
+            kotak_surat = KotakSurat()
+            kotak_surat.surat = data_surat
+            kotak_surat.catatan_tambahan = data_form.get('catatan_tambahan')
+            kotak_surat.penerima = data_form.get('penerima')
+            kotak_surat.status = "diterima"
+            kotak_surat.pengirim = user_saat_ini
+            kotak_surat.jenis_pengiriman = "langsung"
+            kotak_surat.save()
+
+            # ubah status surat menjadi dikirim agar tidak bisa diubah maupun dihapus
+            data_surat.status = "dikirim"
+            data_surat.save()
+
+            # tambahkan data track surat
+            status_track_surat = "Surat no %s dikirimkan ke %s oleh %s." %(data_surat.no_surat, kotak_surat.penerima, kotak_surat.pengirim)
+            catat_track_surat(data_surat, status_track_surat)
+
+            # kembali ke halaman daftar surat
+            return HttpResponseRedirect('/surat/')
+
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = KirimSuratForm()
+        data['form'] = form
+
+
+    data['surat'] = data_surat
+    data['no_surat'] = no_surat
+    data['page_surat_active'] ='active'
+
+    return render(request, 'MainApp/surat/surat_kirim.html', data)
 
 @login_required
 def disposisi_tambah(request, no_surat):

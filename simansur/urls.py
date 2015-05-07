@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^surat_edit/(?P<no_surat>[\w]+)/$', views.surat_edit, name='surat_edit'),
     url(r'^surat_delete/(?P<no_surat>[\w]+)/$', views.surat_delete, name='surat_delete'),
     url(r'^surat_download/(?P<no_surat>[\w]+)/$', views.surat_download, name='surat_download'),
+    url(r'^surat_kirim/(?P<no_surat>[\w]+)/$', views.surat_kirim, name='surat_kirim'),
 
     url(r'^disposisi_tambah/(?P<no_surat>[\w]+)/$', views.disposisi_tambah, name='disposisi_tambah'),
     url(r'^disposisi_edit/(?P<id_disposisi>[\w]+)/$', views.disposisi_edit, name='disposisi_edit'),

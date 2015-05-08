@@ -70,6 +70,9 @@ class StatistikForm(forms.Form):
     bulan = forms.IntegerField(label="Bulan")
     tahun = forms.IntegerField(label="Tahun")
 
+class CariSuratForm(forms.Form):
+    kata_kunci = forms.CharField(label="Kata Kunci", max_length=50)
+
 
 
 

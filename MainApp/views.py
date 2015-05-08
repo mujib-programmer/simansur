@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
-from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm
+from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm, CariSuratForm
 
 DATA_PER_HALAMAN = 2 # untuk pagination
 
@@ -41,17 +41,52 @@ def surat(request):
     # user yang sedang login
     user_saat_ini = request.user
 
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        form = CariSuratForm(request.POST, empty_permitted=True)
+        data['form'] = form
+        kata_kunci = None
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            data_form = form.cleaned_data
+
+            if data_form.get('kata_kunci') != "":
+                kata_kunci = data_form.get('kata_kunci')
+
+        else:
+            print(form.errors)
+
+    else:
+        kata_kunci = None
+
+        form = CariSuratForm(empty_permitted=True)
+        data['form'] = form
+
     # ambil data surat sesuai dengan yang login
     if user_dalam_group(user_saat_ini, 'manajer') | user_saat_ini.is_superuser:
-        # manajer surat atau superadmin akan bisa mendapatkan semua data surat
-        semua_surat = Surat.objects.all()
+
+        try:
+            # manajer surat atau superadmin akan bisa mendapatkan semua data surat
+            if kata_kunci == None :
+                semua_surat = Surat.objects.all()
+            else:
+                semua_surat = Surat.objects.filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
+
+        except Surat.DoesNotExist:
+            semua_surat = None
+
 
     else:
         # selain admin atau manajer hanya akan mendapatkan data surat yang ditujukan atau di dikirim olehnya
         try:
             # ambil semua surat yang terkait dengan user saja
             # user terkait yaitu, pengirim surat, penerima surat, dan penerima disposisi
-            semua_surat = Surat.objects.filter(pencatat=user_saat_ini)
+            if kata_kunci == None :
+                semua_surat = Surat.objects.filter(pencatat=user_saat_ini)
+            else:
+                semua_surat = Surat.objects.filter(pencatat=user_saat_ini)\
+                    .filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
 
         except Surat.DoesNotExist:
             semua_surat = None
@@ -264,15 +299,47 @@ def surat_kirim(request, no_surat):
 def surat_pengguna(request):
     # data untuk di tampilkan di template
     data = {}
+    kata_kunci = None
 
     # user yang sedang login
     user_saat_ini = request.user
 
+     # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        form = CariSuratForm(request.POST, empty_permitted=True)
+        data['form'] = form
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            data_form = form.cleaned_data
+
+            if data_form.get('kata_kunci') != "":
+                kata_kunci = data_form.get('kata_kunci')
+
+        else:
+            print(form.errors)
+
+    else:
+
+        form = CariSuratForm(empty_permitted=True)
+        data['form'] = form
+
+
     try:
         # ambil surat yang hanya diterima oleh user
-        semua_surat_penguna = KotakSurat.objects.filter(penerima=user_saat_ini)
+        if kata_kunci == None:
+            semua_surat_penguna = KotakSurat.objects.filter(penerima=user_saat_ini)
 
-    except Surat.DoesNotExist:
+        else:
+
+            try:
+                surat_dicari = Surat.objects.filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
+                semua_surat_penguna = KotakSurat.objects.filter( Q(penerima=user_saat_ini), Q(surat=surat_dicari) )
+
+            except Surat.DoesNotExist:
+                semua_surat_penguna = None
+
+    except KotakSurat.DoesNotExist:
         semua_surat_penguna = None
 
 

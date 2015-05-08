@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h1>Daftar Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {% if semua_surat %}
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Tanggal Surat</th>
+                    <th>No Surat</th>
+                    <th>Pengirim</th>
+                    <th>Penerima</th>
+                    <th>Catatan Tambahan</th>
+                    <th>Status Surat</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                {% for surat in semua_surat %}
+
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ surat.tanggal }}</td>
+                    <td>{{ surat.surat }}</td>
+                    <td>{{ surat.pengirim }}</td>
+                    <td>{{ surat.penerima }}</td>
+                    <td>{{ surat.catatan_tambahan }}</td>
+                    <td>{{ surat.status }}</td>
+                    <td>
+                        <a href="/surat_pengguna_detail/{{ surat.id }}/">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                        </button>
+                        </a>
+
+                        {% if surat.status == 'dibaca' %}
+                        <a href="/surat_pengguna_disposisi/{{ surat.id }}/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        {% endif %}
+
+
+
+
+
+                    </td>
+                  </tr>
+
+                  {% endfor %}
+
+                </tbody>
+              </table>
+
+                {% else %}
+                    <p>Tidak ada surat di kotak surat</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+
+
+
+
+{% endblock %}

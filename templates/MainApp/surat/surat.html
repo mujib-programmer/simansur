@@ -42,14 +42,6 @@
                     <td>{{ surat.tingkat_kepentingan }}</td>
                     <td>{{ surat.status }}</td>
                     <td>
-                        {% if surat.status == 'dilabeli' %}
-                        <a href="/surat_kirim/{{ surat.no_surat }}" >
-                        <button type="button" class="btn btn-default" aria-label="Left Align">
-                            <span class="glyphicon glyphicon glyphicon-envelope" aria-hidden="true"></span>
-                        </button>
-                        </a>
-                        {% endif %}
-
                         <a href="/surat/{{ surat.no_surat }}">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
@@ -76,6 +68,22 @@
                         <a href="/surat_delete/{{ surat.no_surat }}" onclick="return confirm('Apakah anda yakin ingin menghapus surat no {{ surat.no_surat }} ?');">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        {% endif %}
+
+                        {% if surat.status == 'dilabeli' %}
+                        <a href="/surat_kirim/{{ surat.no_surat }}" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        </button>
+                        </a>
+                        {% endif %}
+
+                        {% if surat.status != 'dilabeli' %}
+                        <a href="/track_surat/{{ surat.no_surat }}/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-share" aria-hidden="true"></span>
                         </button>
                         </a>
                         {% endif %}

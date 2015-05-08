@@ -57,7 +57,7 @@
                 <li class="{{ page_home_active }}"><a href="{% url 'home' %}">Home</a></li>
 
                 {% if user.is_authenticated %}
-                <li class="{{ page_surat_active }}"><a href="{% url 'surat' %}">Kotak Masuk</a></li>
+                <li class="{{ page_surat_pengguna_active }}"><a href="{% url 'surat_pengguna' %}">Kotak Masuk</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Surat <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">

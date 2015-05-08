@@ -20,6 +20,13 @@ urlpatterns = patterns('',
     url(r'^surat_download/(?P<no_surat>[\w]+)/$', views.surat_download, name='surat_download'),
     url(r'^surat_kirim/(?P<no_surat>[\w]+)/$', views.surat_kirim, name='surat_kirim'),
 
+    url(r'^track_surat/(?P<no_surat>[\w]+)/$', views.track_surat, name='track_surat'),
+
+
+    url(r'^surat_pengguna/$', views.surat_pengguna, name='surat_pengguna'),
+    url(r'^surat_pengguna_detail/(?P<id>[\w]+)/$', views.surat_pengguna_detail, name='surat_pengguna_detail'),
+    url(r'^surat_pengguna_disposisi/(?P<id>[\w]+)/$', views.surat_pengguna_disposisi, name='surat_pengguna_disposisi'),
+
     url(r'^disposisi_tambah/(?P<no_surat>[\w]+)/$', views.disposisi_tambah, name='disposisi_tambah'),
     url(r'^disposisi_edit/(?P<id_disposisi>[\w]+)/$', views.disposisi_edit, name='disposisi_edit'),
     url(r'^disposisi_delete/(?P<no_surat>[\w]+)/(?P<id_disposisi>[\w]+)/$', views.disposisi_delete, name='disposisi_delete'),

@@ -261,6 +261,110 @@ def surat_kirim(request, no_surat):
     return render(request, 'MainApp/surat/surat_kirim.html', data)
 
 @login_required
+def surat_pengguna(request):
+    # data untuk di tampilkan di template
+    data = {}
+
+    # user yang sedang login
+    user_saat_ini = request.user
+
+    try:
+        # ambil surat yang hanya diterima oleh user
+        semua_surat_penguna = KotakSurat.objects.filter(penerima=user_saat_ini)
+
+    except Surat.DoesNotExist:
+        semua_surat_penguna = None
+
+
+    data['semua_surat'] = semua_surat_penguna
+    data['page_surat_pengguna_active'] = 'active'
+
+
+    return render(request, 'MainApp/surat_pengguna/surat_pengguna.html', data)
+
+@login_required
+def surat_pengguna_detail(request, id):
+    data = {}
+
+    pengguna_saat_ini = request.user
+
+    # get data surat
+    data_surat = KotakSurat.objects.get(id=id)
+
+    # ubah status surat menjadi dibaca
+    data_surat.status = "dibaca"
+    data_surat.save()
+
+    data['surat'] = data_surat
+    data['page_surat_pengguna_active'] = 'active'
+
+    return render(request, 'MainApp/surat_pengguna/surat_pengguna_detail.html', data)
+
+@login_required
+def surat_pengguna_disposisi(request, id):
+    data = {}
+
+    user_saat_ini = request.user
+
+    # get data surat
+    data_kotak_surat_didisposisikan = KotakSurat.objects.get(id=id)
+    data_surat = data_kotak_surat_didisposisikan.surat
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = KirimSuratForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+
+            data_form = form.cleaned_data
+
+            # buat data kotak surat baru untuk user penerima
+            kotak_surat = KotakSurat()
+            kotak_surat.surat = data_surat
+            kotak_surat.catatan_tambahan = data_form.get('catatan_tambahan')
+            kotak_surat.penerima = data_form.get('penerima')
+            kotak_surat.status = "diterima"
+            kotak_surat.pengirim = user_saat_ini
+            kotak_surat.jenis_pengiriman = "disposisi"
+            kotak_surat.save()
+
+            # ubah status kotak surat yang sedang didisposisikan
+            data_kotak_surat_didisposisikan.status = "didisposisi"
+            data_kotak_surat_didisposisikan.save()
+
+            # tambahkan data ke model disposisi
+            disposisi_surat = Disposisi()
+            disposisi_surat.surat = data_surat
+            disposisi_surat.pengirim = user_saat_ini
+            disposisi_surat.penerima = data_form.get('penerima')
+            disposisi_surat.status = "diterima"
+            disposisi_surat.keterangan_disposisi = data_form.get('catatan_tambahan')
+            disposisi_surat.save()
+
+            # tambahkan data track surat
+            status_track_surat = "Surat no %s didisposisikan ke %s oleh %s." %(data_surat.no_surat, kotak_surat.penerima, kotak_surat.pengirim)
+            catat_track_surat(data_surat, status_track_surat)
+
+            # kembali ke halaman daftar surat
+            return HttpResponseRedirect('/surat_pengguna/')
+
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print(form.errors)
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = KirimSuratForm()
+        data['form'] = form
+
+
+    data['surat'] = data_surat
+    data['id'] = id
+    data['page_surat_pengguna_active'] ='active'
+
+    return render(request, 'MainApp/surat_pengguna/surat_pengguna_disposisi.html', data)
+
+@login_required
 def disposisi_tambah(request, no_surat):
 
     # dapatkan data user yang sedang login
@@ -621,7 +725,7 @@ def user_login(request):
                 # log aktivitas login
                 log_aktivitas(user, "%s login." % user.username)
 
-                return HttpResponseRedirect('/surat/')
+                return HttpResponseRedirect('/surat_pengguna/')
             else:
                 # An inactive account was used - no logging in!
                 template_dict['alert_type'] = 'danger'
@@ -652,6 +756,21 @@ def user_logout(request):
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/')
+
+@login_required
+def track_surat(request, no_surat):
+    data = {}
+
+    user_saat_ini = request.user
+
+    data_surat = Surat.objects.get(no_surat=no_surat)
+    semua_track_surat = TrackSurat.objects.filter(surat=data_surat)
+
+    data['surat'] = data_surat
+    data['semua_track_surat'] = semua_track_surat
+    data['no_surat'] = no_surat
+
+    return render(request, 'MainApp/track_surat/track_surat.html', data)
 
 @login_required
 def aktivitas(request):

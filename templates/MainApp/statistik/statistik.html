@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ slug|capfirst }}{% endblock %}
+
+{% block body-id %}{{ slug|slugify }}{% endblock %}
+
+{% block content%}
+        <div class="page-header">
+            <h2>Form Pencarian Statistik</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <form class="form-horizontal" role="form" id="statistik_form" method="post" action="/statistik/">
+
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                {% for field in form.visible_fields %}
+
+                    <div class="form-group">
+                        {{ field.errors }}
+                        {{ field.help_text }}
+                        <label class="control-label col-sm-2">{{ field.label }} </label>
+                        <div class="col-sm-10"> {{ field }} </div>
+                    </div>
+                {% endfor %}
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <input type="submit" name="submit" value="Lihat Statistik" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Statistik Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                {{ data_statistik_surat }}
+            </div>
+        </div>
+
+{% endblock %}

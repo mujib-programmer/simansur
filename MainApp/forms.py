@@ -8,6 +8,23 @@ TINGKAT_KEPENTINGAN_SURAT_CHOICES = (
     ('penting', 'penting'),
 )
 
+"""
+BULAN_CHOICES = (
+    ('1', 'Januari'),
+    ('2', 'Februari'),
+    ('3', 'Maret'),
+    ('4', 'April'),
+    ('5', 'Mei'),
+    ('6', 'Juni'),
+    ('7', 'Juli'),
+    ('8', 'Agustus'),
+    ('9', 'September'),
+    ('10', 'Oktober'),
+    ('11', 'November'),
+    ('12', 'Desember'),
+)
+"""
+
 class SuratForm(forms.ModelForm):
     no_surat = forms.CharField(label='No Surat')
     no_agenda = forms.CharField(label='No Agenda')
@@ -47,6 +64,12 @@ class UserProfileForm(forms.Form):
 class KirimSuratForm(forms.Form):
     penerima = forms.ModelChoiceField(label='Penerima Surat', queryset=User.objects.all())
     catatan_tambahan = forms.CharField(label="Catatan Tambahan", widget=forms.Textarea)
+
+class StatistikForm(forms.Form):
+    #bulan = forms.ChoiceField(label='Bulan', choices=BULAN_CHOICES)
+    bulan = forms.IntegerField(label="Bulan")
+    tahun = forms.IntegerField(label="Tahun")
+
 
 
 

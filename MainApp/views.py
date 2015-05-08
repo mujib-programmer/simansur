@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
-from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm
+from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm
 
 DATA_PER_HALAMAN = 2 # untuk pagination
 
@@ -808,17 +808,50 @@ def aktivitas(request):
 
 @login_required
 def statistik(request):
-    current_month = datetime.now().month
+    data = {}
 
-    surat_bulan_ini = Surat.objects.filter(tanggal_surat_masuk__month=current_month)
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        form = StatistikForm(request.POST)
+        data['form'] = form
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            data_form = form.cleaned_data
+
+            bulan = data_form.get('bulan')
+            tahun = data_form.get('tahun')
+
+
+
+
+
+        else:
+            print(form.errors)
+
+    else:
+        bulan = datetime.now().month
+        tahun = datetime.now().year
+
+
+        initial_data = {}
+        initial_data['bulan'] = bulan
+        initial_data['tahun'] = tahun
+
+        form = StatistikForm(initial=initial_data)
+
+        data['form'] = form
+
+
+    surat_bulan_cari = Surat.objects.filter(tanggal_surat_masuk__month=bulan, tanggal_surat_masuk__year=tahun)
 
     data_statistik_surat = "Jumlah surat yang dikirim bulan %s tahun %s = %s." \
-                           % (str(datetime.now().month) , str(datetime.now().year), str(surat_bulan_ini.count()) )
+                               % (str(bulan) , str(tahun), str(surat_bulan_cari.count()) )
 
-    context_dict = {'data_statistik_surat': data_statistik_surat}
+    data['data_statistik_surat'] = data_statistik_surat
 
 
-    return render(request, "MainApp/statistik.html", context_dict)
+    return render(request, "MainApp/statistik/statistik.html", data)
 
 
 """

@@ -5,8 +5,23 @@
 {% block body-id %}{{ slug|slugify }}{% endblock %}
 
 {% block content%}
-        <div class="page-header">
-            <h1>Daftar User</h1>
+
+        <div class="row page-header">
+            <div class="col-md-10">
+                <h1>Daftar User</h1>
+            </div>
+
+            {% if perms.MainApp.add_user %}
+            <div class="col-md-2">
+                <h1>
+                    <a href="{% url 'user_tambah' %}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"> User Baru</span>
+                        </button>
+                    </a>
+                </h1>
+            </div>
+            {% endif %}
         </div>
 
         <div class="row">
@@ -20,12 +35,8 @@
                     <th>Username</th>
                     <th>Email</th>
                     <th>Groups</th>
-                    <th>Nama Depan</th>
-                    <th>Nama Belakang</th>
-                    <th>Status Aktif</th>
                     <th>Jabatan</th>
                     <th>Bidang</th>
-                    <th>No HP</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
@@ -41,23 +52,15 @@
                             {{ ', ' }}
                       {% endfor %}
                     </td>
-                    <td>{{ user_profile.user.first_name }}</td>
-                    <td>{{ user_profile.user.last_name }}</td>
-                    <td>{{ user_profile.user.is_active }}</td>
                     <td>{{ user_profile.jabatan }}</td>
                     <td>{{ user_profile.bidang }}</td>
-                    <td>{{ user_profile.no_telepon }}</td>
                     <td>
                         <a href="/user/{{ user_profile.user.username }}/">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                         </button>
                         </a>
-                        <a href="{% url 'user_tambah' %}">
-                        <button type="button" class="btn btn-default" aria-label="Left Align">
-                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        </button>
-                        </a>
+
                         <a href="/user_edit/{{ user_profile.user.username }}/">
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>

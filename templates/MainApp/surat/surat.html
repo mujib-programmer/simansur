@@ -34,12 +34,26 @@
                     </div>
                 {% endfor %}
 
+                </form>
             </div>
         </div>
 
+        <div class="row page-header">
+            <div class="col-md-10">
+                <h1>Daftar Surat</h1>
+            </div>
 
-        <div class="page-header">
-            <h1>Daftar Surat</h1>
+            {% if perms.MainApp.add_surat %}
+            <div class="col-md-2">
+                <h1>
+                    <a href="{% url 'surat_tambah' %}">
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"> Label Surat</span>
+                        </button>
+                    </a>
+                </h1>
+            </div>
+            {% endif %}
         </div>
 
         <div class="row">
@@ -58,7 +72,10 @@
                     <th>Pengirim</th>
                     <th>Tingkat Kepentingan</th>
                     <th>Status Surat</th>
-                    <th>Aksi</th>
+                    <th>Aksi
+
+
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -80,14 +97,6 @@
                             <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                         </button>
                         </a>
-
-                        {% if perms.MainApp.add_surat %}
-                        <a href="{% url 'surat_tambah' %}">
-                        <button type="button" class="btn btn-default" aria-label="Left Align">
-                            <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        </button>
-                        </a>
-                        {% endif %}
 
                         {% if perms.MainApp.change_surat and surat.status == 'dilabeli' %}
                         <a href="/surat_edit/{{ surat.no_surat }}">

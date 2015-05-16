@@ -57,6 +57,16 @@
                     <td>No HP</td>
                     <td>{{ user_profile.no_telepon }}</td>
                 </tr>
+                <tr>
+                    <td>Aksi</td>
+                    <td>
+                        <a href="{% url 'user' %}" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Lihat Daftar User</span>
+                        </button>
+                        </a>
+                    </td>
+                </tr>
                 </tbody>
               </table>
 
@@ -67,13 +77,6 @@
             </div>
         </div>
 
-        <a href="{% url 'user' %}"> Lihat Daftar User </a>
-
         <br /> <br />
-
-
-
-
-
 
 {% endblock %}

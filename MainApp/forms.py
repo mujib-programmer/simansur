@@ -59,7 +59,16 @@ class UserProfileForm(forms.Form):
     is_active = forms.BooleanField(label="Status Aktif", required=False)
     jabatan = forms.CharField(label="Jabatan", max_length=40)
     bidang = forms.CharField(label="Bidang", max_length=40)
-    no_telepon = forms.IntegerField(label="No Telepon")
+    no_telepon = forms.CharField(label="No Telepon", max_length=15)
+
+    def clean_no_telepon(self):
+        n = self.cleaned_data.get('no_telepon')
+        for allowednondigit in '':
+            n.replace(allowednondigit, '')
+        for char in n:
+            if char not in '0123456789':
+                raise forms.ValidationError("No telepon hanya menerima input karakter angka.")
+        return n
 
 class KirimSuratForm(forms.Form):
     penerima = forms.ModelChoiceField(label='Penerima Surat', queryset=User.objects.all())

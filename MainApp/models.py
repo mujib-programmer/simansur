@@ -6,7 +6,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     bidang = models.CharField(max_length=40, default="")
     jabatan = models.CharField(max_length=40, default="")
-    no_telepon = models.BigIntegerField()
+    no_telepon = models.CharField(max_length=15, default="")
 
     #def __unicode__(self): #For Python 2, use __str__ on Python 3
     def __str__(self):

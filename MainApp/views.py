@@ -1,4 +1,4 @@
-import  os
+import  os, urllib.request, urllib.parse, json
 
 from datetime import datetime
 
@@ -277,6 +277,9 @@ def surat_kirim(request, no_surat):
             status_track_surat = "Surat no %s dikirimkan ke %s oleh %s." %(data_surat.no_surat, kotak_surat.penerima, kotak_surat.pengirim)
             catat_track_surat(data_surat, status_track_surat)
 
+            # kirim notifikasi ke penerima
+            kirim_notifikasi(kotak_surat.penerima)
+
             # kembali ke halaman daftar surat
             return HttpResponseRedirect('/surat/')
 
@@ -412,6 +415,9 @@ def surat_pengguna_disposisi(request, id):
             # tambahkan data track surat
             status_track_surat = "Surat no %s didisposisikan ke %s oleh %s." %(data_surat.no_surat, kotak_surat.penerima, kotak_surat.pengirim)
             catat_track_surat(data_surat, status_track_surat)
+
+            # kirim notifikasi ke penerima
+            kirim_notifikasi(kotak_surat.penerima)
 
             # kembali ke halaman daftar surat
             return HttpResponseRedirect('/surat_pengguna/')
@@ -774,6 +780,24 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        # cek di akun di ldap
+        url_ldap = 'https://apps.cs.ui.ac.id/webservice/login_ldap.php/?username='+ username +'&password=' + password
+        req_akun_ldap = urllib.request.Request( url_ldap )
+        res_akun_ldap = urllib.request.urlopen(req_akun_ldap)
+        data_akun_ldap = res_akun_ldap.read()
+
+        # debug start
+        print(url_ldap)
+        print(req_akun_ldap)
+        print(res_akun_ldap)
+        print(data_akun_ldap)
+        #print(data_akun_ldap.decode("utf-8")) # Convert bytes to a Python string
+        # debug end
+
+        # cek apakah user sudah ada di database simansur, jika belum ada maka tambahkan sebagai user baru.
+
+        # Ijinkan user untuk login ke simansur dengan username dan password yang sudah dibanding di ldap
+
         # Use Django's machinery to attempt to see if the username/password
         # combination is valid - a User object is returned if it is.
 
@@ -943,4 +967,8 @@ def is_admin(user):
 
 def user_dalam_group(user, nama_group):
     return user.groups.filter(name=nama_group).exists()
+
+def kirim_notifikasi(user):
+    # lihat di catatan project
+    pass
 

@@ -91,8 +91,23 @@ def surat(request):
         except Surat.DoesNotExist:
             semua_surat = None
 
+    # pagination untuk surat (label surat)
+    paginator = Paginator(semua_surat, DATA_PER_HALAMAN)
 
-    data['semua_surat'] = semua_surat
+    page = request.GET.get('page')
+    try:
+        label_surat = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        label_surat = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        label_surat = paginator.page(paginator.num_pages)
+
+    jumlah_data_sebelumnya  = (label_surat.number - 1) * DATA_PER_HALAMAN
+
+    data['semua_surat'] = label_surat
+    data['jumlah_data_sebelumnya'] = jumlah_data_sebelumnya
     data['page_surat_active'] = 'active'
 
 
@@ -346,7 +361,23 @@ def surat_pengguna(request):
         semua_surat_penguna = None
 
 
-    data['semua_surat'] = semua_surat_penguna
+    # pagination untuk surat (label surat)
+    paginator = Paginator(semua_surat_penguna, DATA_PER_HALAMAN)
+
+    page = request.GET.get('page')
+    try:
+        surat_penguna = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        surat_penguna = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        surat_penguna = paginator.page(paginator.num_pages)
+
+    jumlah_data_sebelumnya  = (surat_penguna.number - 1) * DATA_PER_HALAMAN
+
+    data['semua_surat'] = surat_penguna
+    data['jumlah_data_sebelumnya'] = jumlah_data_sebelumnya
     data['page_surat_pengguna_active'] = 'active'
 
 

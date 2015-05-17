@@ -34,6 +34,8 @@
                     </div>
                 {% endfor %}
 
+                </form>
+
             </div>
         </div>
 
@@ -66,7 +68,7 @@
                 {% for surat in semua_surat %}
 
                   <tr>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ forloop.counter|add:jumlah_data_sebelumnya }}</td>
                     <td>{{ surat.tanggal }}</td>
                     <td>{{ surat.surat }}</td>
                     <td>{{ surat.surat.perihal }}</td>
@@ -100,6 +102,22 @@
 
                 </tbody>
               </table>
+
+              <div class="pagination">
+                    <span class="step-links">
+                        {% if semua_surat.has_previous %}
+                            <a href="?page={{ semua_surat.previous_page_number }}"> Sebelumnya </a>
+                        {% endif %}
+
+                        <span class="current">
+                            Halaman {{ semua_surat.number }} dari {{ semua_surat.paginator.num_pages }} halaman.
+                        </span>
+
+                        {% if semua_surat.has_next %}
+                            <a href="?page={{ semua_surat.next_page_number }}"> Berikutnya </a>
+                        {% endif %}
+                    </span>
+              </div>
 
                 {% else %}
                     <p>Tidak ada surat di kotak surat</p>

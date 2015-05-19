@@ -944,10 +944,6 @@ def statistik(request):
             bulan = data_form.get('bulan')
             tahun = data_form.get('tahun')
 
-
-
-
-
         else:
             print(form.errors)
 
@@ -971,6 +967,9 @@ def statistik(request):
                                % (str(bulan) , str(tahun), str(surat_bulan_cari.count()) )
 
     data['data_statistik_surat'] = data_statistik_surat
+    data['data_chart'] = dataChartStatistik(tahun)
+    data['tahun'] = tahun
+    data['bulan'] = nama_bulan(bulan)
 
 
     return render(request, "MainApp/statistik/statistik.html", data)
@@ -980,12 +979,52 @@ def statistik(request):
 Daftar method yang dipanggil oleh method lain dalam views
 """
 
+def dataChartStatistik(tahun):
+    data = []
+
+    for bulan in range(1, 12):
+        data_surat = Surat.objects.filter(tanggal_surat_masuk__month=bulan, tanggal_surat_masuk__year=tahun)
+        data.append(data_surat.count())
+
+    return data
+
 def log_aktivitas(user, aktivitas):
     # log aktivitas login
     log_aktivitas = Aktivitas()
     log_aktivitas.user = user
     log_aktivitas.aktivitas = aktivitas
     log_aktivitas.save()
+
+def nama_bulan(bulan):
+    if bulan == 1:
+        nama = "Januari"
+    elif bulan == 2:
+        nama = "Februari"
+    elif bulan == 3:
+        nama = "Maret"
+    elif bulan == 4:
+        nama = "April"
+    elif bulan == 5:
+        nama = "Mei"
+    elif bulan == 6:
+        nama = "Juni"
+    elif bulan == 7:
+        nama = "Juli"
+    elif bulan == 8:
+        nama = "Agustus"
+    elif bulan == 9:
+        nama = "September"
+    elif bulan == 10:
+        nama = "Oktober"
+    elif bulan == 11:
+        nama = "November"
+    elif bulan == 12:
+        nama = "Desember"
+    else:
+        nama = ""
+
+    return nama
+
 
 def catat_track_surat(surat, status_surat):
     trackSurat = TrackSurat()

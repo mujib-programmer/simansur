@@ -69,9 +69,9 @@ def surat(request):
         try:
             # manajer surat atau superadmin akan bisa mendapatkan semua data surat
             if kata_kunci == None :
-                semua_surat = Surat.objects.all()
+                semua_surat = Surat.objects.all().order_by('-tanggal_surat_masuk')
             else:
-                semua_surat = Surat.objects.filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
+                semua_surat = Surat.objects.filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci)).order_by('-tanggal_surat_masuk')
 
         except Surat.DoesNotExist:
             semua_surat = None
@@ -83,10 +83,11 @@ def surat(request):
             # ambil semua surat yang terkait dengan user saja
             # user terkait yaitu, pengirim surat, penerima surat, dan penerima disposisi
             if kata_kunci == None :
-                semua_surat = Surat.objects.filter(pencatat=user_saat_ini)
+                semua_surat = Surat.objects.filter(pencatat=user_saat_ini).order_by('-tanggal_surat_masuk')
             else:
                 semua_surat = Surat.objects.filter(pencatat=user_saat_ini)\
-                    .filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
+                    .filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))\
+                    .order_by('-tanggal_surat_masuk')
 
         except Surat.DoesNotExist:
             semua_surat = None
@@ -346,13 +347,13 @@ def surat_pengguna(request):
     try:
         # ambil surat yang hanya diterima oleh user
         if kata_kunci == None:
-            semua_surat_penguna = KotakSurat.objects.filter(penerima=user_saat_ini)
+            semua_surat_penguna = KotakSurat.objects.filter(penerima=user_saat_ini).order_by('-tanggal')
 
         else:
 
             try:
                 surat_dicari = Surat.objects.filter(Q(no_surat__contains=kata_kunci) | Q(perihal__contains=kata_kunci))
-                semua_surat_penguna = KotakSurat.objects.filter( Q(penerima=user_saat_ini), Q(surat=surat_dicari) )
+                semua_surat_penguna = KotakSurat.objects.filter( Q(penerima=user_saat_ini), Q(surat=surat_dicari) ).order_by('-tanggal')
 
             except Surat.DoesNotExist:
                 semua_surat_penguna = None
@@ -904,7 +905,7 @@ def aktivitas(request):
         data['alert_message'] = "Hanya administrator yang dijinkan untuk mengakses halaman log aktivitas!"
         return render(request, "MainApp/index.html", data)
 
-    semua_aktivitas_user = Aktivitas.objects.all()
+    semua_aktivitas_user = Aktivitas.objects.all().order_by('-tanggal')
 
     paginator = Paginator(semua_aktivitas_user, DATA_PER_HALAMAN)
 

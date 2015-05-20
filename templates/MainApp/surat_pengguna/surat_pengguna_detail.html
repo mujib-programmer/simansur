@@ -37,7 +37,7 @@
                     <td>{{ surat.status }}</td>
                 </tr>
                 <tr>
-                    <td>Surat</td>
+                    <td>No Surat</td>
                     <td><a href="/surat/{{ surat.surat.no_surat }}/" >{{ surat.surat }}</a></td>
                 </tr>
                 <tr>
@@ -51,6 +51,14 @@
                         <a href="/surat_pengguna_disposisi/{{ surat.id }}/" >
                         <button type="button" class="btn btn-default" aria-label="Left Align">
                             <span class="glyphicon glyphicon glyphicon-envelope" aria-hidden="true"> Disposisikan</span>
+                        </button>
+                        </a>
+                        {% endif %}
+
+                        {% if surat.surat.status != 'dilabeli' %}
+                        <a href="/track_surat/{{ surat.surat.no_surat }}/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-share" aria-hidden="true"> Track Surat</span>
                         </button>
                         </a>
                         {% endif %}

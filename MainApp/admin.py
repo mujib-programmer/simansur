@@ -21,9 +21,9 @@ class TrackSuratAdmin(admin.ModelAdmin):
     list_display = ('id', 'surat', 'tanggal', 'status')
 
 # Register your models here.
-admin.site.register(Surat, SuratAdmin)
-admin.site.register(KotakSurat, KotakSuratAdmin)
-admin.site.register(Disposisi, DisposisiAdmin)
+#admin.site.register(Surat, SuratAdmin)
+#admin.site.register(KotakSurat, KotakSuratAdmin)
+#admin.site.register(Disposisi, DisposisiAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(Aktivitas, AktivitasAdmin)
-admin.site.register(TrackSurat, TrackSuratAdmin)
+#admin.site.register(Aktivitas, AktivitasAdmin)
+#admin.site.register(TrackSurat, TrackSuratAdmin)

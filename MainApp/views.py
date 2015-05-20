@@ -1,4 +1,5 @@
-import  os, urllib.request, urllib.parse, json
+import  os, json, urllib
+import urllib.request as urllib2
 
 from datetime import datetime
 
@@ -14,6 +15,7 @@ from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat,
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm, CariSuratForm
 
 DATA_PER_HALAMAN = 2 # untuk pagination
+INTEGRASI_LDAP = False
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
 # user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
@@ -799,7 +801,6 @@ def user_delete(request, username):
     return HttpResponseRedirect('/user/')
 
 def user_login(request):
-
     template_dict = {'page_login_active':'active'}
 
     # If the request is a HTTP POST, try to pull out the relevant information.
@@ -812,27 +813,55 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # cek di akun di ldap
-        url_ldap = 'https://apps.cs.ui.ac.id/webservice/login_ldap.php/?username='+ username +'&password=' + password
-        req_akun_ldap = urllib.request.Request( url_ldap )
-        res_akun_ldap = urllib.request.urlopen(req_akun_ldap)
-        data_akun_ldap = res_akun_ldap.read()
+        # menangani login menggunakan integrasi ldap
+        if INTEGRASI_LDAP == True:
 
-        # debug start
-        print(url_ldap)
-        print(req_akun_ldap)
-        print(res_akun_ldap)
-        print(data_akun_ldap)
-        #print(data_akun_ldap.decode("utf-8")) # Convert bytes to a Python string
-        # debug end
+            # cek di akun di ldap
+            param =  urllib.parse.urlencode({"username":username,"password":password})
+            myrequest = urllib2.Request('https://apps.cs.ui.ac.id/webservice/login_ldap.php?%s' % (param))
+            response = urllib2.urlopen(myrequest, timeout=1000000).read()
 
-        # cek apakah user sudah ada di database simansur, jika belum ada maka tambahkan sebagai user baru.
+            try:
+                ldap_resp = json.loads(response.decode(encoding='UTF-8'))
+            except:
+                ldap_resp = {'state':0}
+
+
+            # user belum login via ldap
+            if ldap_resp['state'] != 1:
+                template_dict['alert_type'] = 'danger'
+                template_dict['alert_message'] = "Username atau Password salah! username: {0} , password: {1}".format(username, password)
+                return render(request, 'MainApp/login.html', template_dict)
+
+            # user sudah login via ldap
+            else:
+                # cek apakah user sudah ada di database simansur, jika belum ada maka tambahkan sebagai user baru.
+                try:
+                    cek_user = User.objects.get(username__exact=username)
+
+                except User.DoesNotExist:
+                    # buat user baru
+                    user_baru = User()
+                    user_baru.username = username
+                    user_baru.password = password
+                    user_baru.email = username + "@simansur.cu.cc"
+                    user_baru.save()
+
+                    # setting password menggunakan encrypted password
+                    user_baru.set_password(password)
+                    user_baru.is_active = True
+
+                    # tambahkan group penerima ke user
+                    try:
+                        group_penerima = Group.objects.get(name="penerima")
+                        user_baru.groups.add(group_penerima)
+                    except Group.DoesNotExist:
+                        pass
+
+                    user_baru.save()
+            # akhir kode integrasi ldap
 
         # Ijinkan user untuk login ke simansur dengan username dan password yang sudah dibanding di ldap
-
-        # Use Django's machinery to attempt to see if the username/password
-        # combination is valid - a User object is returned if it is.
-
         user = authenticate(username=username, password=password)
 
         # If we have a User object, the details are correct.

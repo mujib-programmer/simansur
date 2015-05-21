@@ -59,6 +59,8 @@
 
                 {% if user.is_authenticated %}
                 <li class="{{ page_surat_pengguna_active }}"><a href="{% url 'surat_pengguna' %}">Kotak Masuk</a></li>
+
+                  {% if perms.MainApp.add_surat %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tools <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">
@@ -66,8 +68,9 @@
                     <li class="{{ page_statistic_surat_active }}"><a href="{% url 'statistik' %}">Lihat Statistik</a></li>
                   </ul>
                 </li>
+                  {% endif %}
 
-                    {% if user.is_superuser %}
+                  {% if user.is_superuser %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">
@@ -75,7 +78,7 @@
                     <li class="{{ page_aktivitas_active }}"><a href="{% url 'aktivitas' %}">Aktivitas</a></li>
                   </ul>
                 </li>
-                    {% endif %}
+                  {% endif %}
 
                 {% endif %}
               </ul>

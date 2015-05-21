@@ -44,19 +44,6 @@ class KotakSurat(models.Model):
     def __str__(self):
         return self.no_surat
 
-class Disposisi(models.Model):
-    id = models.AutoField(primary_key=True)
-    surat = models.ForeignKey(Surat, null=False, related_name='surat_disposisi')
-    pengirim = models.ForeignKey(User, null=True, related_name='pengirim_disposisi')
-    penerima = models.ForeignKey(User, null=True, related_name='penerima_disposisi')
-    status = models.CharField(null=True, max_length=50)
-    keterangan_disposisi = models.CharField(null=True, max_length=255)
-    tanggal = models.DateTimeField(auto_now_add=True)
-
-    #def __unicode__(self):  #For Python 2, use __str__ on Python 3
-    def __str__(self):
-        return str( self.surat )
-
 class Aktivitas(models.Model):
     id = models.AutoField(primary_key=True)
     tanggal = models.DateTimeField(null=False,auto_now_add=True)

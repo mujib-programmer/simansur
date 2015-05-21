@@ -1,5 +1,5 @@
 from django.contrib import admin
-from MainApp.models import Surat, KotakSurat, Disposisi, UserProfile, Aktivitas, TrackSurat
+from MainApp.models import Surat, KotakSurat, UserProfile, Aktivitas, TrackSurat
 
 class SuratAdmin(admin.ModelAdmin):
     list_display = ('no_surat', 'no_agenda', 'perihal', 'tanggal_surat_masuk', 'pengirim_surat_fisik',
@@ -8,9 +8,6 @@ class SuratAdmin(admin.ModelAdmin):
 class KotakSuratAdmin(admin.ModelAdmin):
     list_display = ('id', 'surat', 'pengirim', 'penerima', 'status', 'catatan_tambahan', 'jenis_pengiriman', 'tanggal')
 
-class DisposisiAdmin(admin.ModelAdmin):
-    list_display = ('id', 'surat', 'pengirim', 'penerima', 'status', 'keterangan_disposisi', 'tanggal')
-    
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'bidang', 'jabatan', 'no_telepon')
 
@@ -23,7 +20,6 @@ class TrackSuratAdmin(admin.ModelAdmin):
 # Register your models here.
 #admin.site.register(Surat, SuratAdmin)
 #admin.site.register(KotakSurat, KotakSuratAdmin)
-#admin.site.register(Disposisi, DisposisiAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 #admin.site.register(Aktivitas, AktivitasAdmin)
 #admin.site.register(TrackSurat, TrackSuratAdmin)

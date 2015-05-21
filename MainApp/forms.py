@@ -8,23 +8,6 @@ TINGKAT_KEPENTINGAN_SURAT_CHOICES = (
     ('penting', 'penting'),
 )
 
-"""
-BULAN_CHOICES = (
-    ('1', 'Januari'),
-    ('2', 'Februari'),
-    ('3', 'Maret'),
-    ('4', 'April'),
-    ('5', 'Mei'),
-    ('6', 'Juni'),
-    ('7', 'Juli'),
-    ('8', 'Agustus'),
-    ('9', 'September'),
-    ('10', 'Oktober'),
-    ('11', 'November'),
-    ('12', 'Desember'),
-)
-"""
-
 class SuratForm(forms.ModelForm):
     no_surat = forms.CharField(label='No Surat')
     no_agenda = forms.CharField(label='No Agenda')
@@ -37,17 +20,6 @@ class SuratForm(forms.ModelForm):
     class Meta:
         model = Surat
         exclude = ('pencatat','tanggal_pencatatan', 'status')
-
-
-class DisposisiForm(forms.ModelForm):
-    penerima_disposisi = forms.ModelChoiceField(label='Penerima Disposisi', queryset=UserProfile.objects.all())
-    #pengirim_disposisi = forms.ModelChoiceField(label='Pengirim Disposisi', queryset=UserProfile.objects.all())
-    tanggal_surat_disposisi = forms.DateField(label='Tanggal Surat Disposisi', widget=SelectDateWidget())
-    catatan_tambahan = forms.CharField(label='Catatan Tambahan')
-
-    class Meta:
-        model = Disposisi
-        exclude = ('surat', 'pengirim_disposisi',)
 
 class UserProfileForm(forms.Form):
     username = forms.SlugField(label="Username", max_length=30)

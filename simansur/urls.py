@@ -27,10 +27,6 @@ urlpatterns = patterns('',
     url(r'^surat_pengguna_detail/(?P<id>[\w]+)/$', views.surat_pengguna_detail, name='surat_pengguna_detail'),
     url(r'^surat_pengguna_disposisi/(?P<id>[\w]+)/$', views.surat_pengguna_disposisi, name='surat_pengguna_disposisi'),
 
-    url(r'^disposisi_tambah/(?P<no_surat>[\w]+)/$', views.disposisi_tambah, name='disposisi_tambah'),
-    url(r'^disposisi_edit/(?P<id_disposisi>[\w]+)/$', views.disposisi_edit, name='disposisi_edit'),
-    url(r'^disposisi_delete/(?P<no_surat>[\w]+)/(?P<id_disposisi>[\w]+)/$', views.disposisi_delete, name='disposisi_delete'),
-
     url(r'^user/$', views.user, name='user'),
     url(r'^user/(?P<username>[\w\-]+)/$', views.user_detail, name='user_detail'),
     url(r'^user_tambah/$', views.user_tambah, name='user_tambah'),

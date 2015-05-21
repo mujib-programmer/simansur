@@ -11,25 +11,12 @@ from django.contrib.auth.models import User, Group, Permission
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
-from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
-from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm, CariSuratForm
+from MainApp.models import Surat, UserProfile, Aktivitas, TrackSurat, KotakSurat
+from MainApp.forms import SuratForm, UserProfileForm, KirimSuratForm, StatistikForm, CariSuratForm
 
 # konfigurasi tambahan
 DATA_PER_HALAMAN = 2 # untuk pagination
-INTEGRASI_LDAP = False # False = integrasi tidak aktiv, True = integrasi aktiv.
-
-# untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
-# user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
-"""
-def group_required(*group_names):
-    #Requires user membership in at least one of the groups passed in
-    def in_groups(u):
-        if u.is_authenticated():
-            if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
-                return True
-        return False
-    return user_passes_test(in_groups, login_url='/login')
-"""
+INTEGRASI_LDAP = False # False = integrasi tidak aktif, True = integrasi aktif.
 
 def index(request):
     context_dict = {'slug': 'login', 'page_home_active':'active'}
@@ -123,14 +110,7 @@ def surat_detail(request, no_surat):
     # get data surat
     dataSurat = Surat.objects.get(no_surat=no_surat)
 
-    try:
-        # get disposisi surat
-        semua_disposisi_surat = Disposisi.objects.filter(surat=dataSurat)
-
-    except Disposisi.DoesNotExist:
-         semua_disposisi_surat = None
-
-    context_dict = {'surat': dataSurat, 'semua_disposisi_surat': semua_disposisi_surat, 'page_surat_active':'active'}
+    context_dict = {'surat': dataSurat, 'page_surat_active':'active'}
 
     return render(request, 'MainApp/surat/surat_detail.html', context_dict)
 
@@ -440,15 +420,6 @@ def surat_pengguna_disposisi(request, id):
             data_kotak_surat_didisposisikan.status = "didisposisi"
             data_kotak_surat_didisposisikan.save()
 
-            # tambahkan data ke model disposisi
-            disposisi_surat = Disposisi()
-            disposisi_surat.surat = data_surat
-            disposisi_surat.pengirim = user_saat_ini
-            disposisi_surat.penerima = data_form.get('penerima')
-            disposisi_surat.status = "diterima"
-            disposisi_surat.keterangan_disposisi = data_form.get('catatan_tambahan')
-            disposisi_surat.save()
-
             # tambahkan data track surat
             status_track_surat = "Surat no %s didisposisikan ke %s oleh %s." %(data_surat.no_surat, kotak_surat.penerima, kotak_surat.pengirim)
             catat_track_surat(data_surat, status_track_surat)
@@ -473,102 +444,6 @@ def surat_pengguna_disposisi(request, id):
     data['page_surat_pengguna_active'] ='active'
 
     return render(request, 'MainApp/surat_pengguna/surat_pengguna_disposisi.html', data)
-
-@login_required
-def disposisi_tambah(request, no_surat):
-
-    # dapatkan data user yang sedang login
-    user_saat_ini = request.user
-    user_profile_saat_ini = UserProfile.objects.get(user=user_saat_ini)
-
-    # get data surat
-    data_surat = Surat.objects.get(no_surat=no_surat)
-
-    # A HTTP POST?
-    if request.method == 'POST':
-        form = DisposisiForm(request.POST, )
-
-        # Have we been provided with a valid form?
-        if form.is_valid():
-
-            disposisi = form.save(commit=False)
-            disposisi.surat = data_surat
-
-            # catat pengirim disposisi dari user yang login saat ini
-            disposisi.pengirim_disposisi = user_profile_saat_ini
-
-            # tambahkan penerima disposisi sebagai user terkait surat
-            data_surat.user_terkait.add(disposisi.penerima_disposisi)
-
-            # ubah status surat
-            status_surat = "Didisposisi ke %s." % disposisi.penerima_disposisi
-            data_surat.status_surat = status_surat
-
-            # ubah keterangan disposisi surat sesuai catatan tambahan disposisi saat ini
-            data_surat.keterangan_disposisi = disposisi.catatan_tambahan
-
-            # simpan surat
-            data_surat.save()
-
-            # tambahkan status surat di track surat
-            catat_track_surat(data_surat, status_surat)
-
-            # simpan data disposisi
-            form.save(commit=True)
-
-            # go to surat view
-            return surat_detail(request, no_surat)
-
-        else:
-            # The supplied form contained errors - just print them to the terminal.
-            print(form.errors)
-    else:
-        # If the request was not a POST, display the form to enter details.
-        form = DisposisiForm()
-
-    return render(request, 'MainApp/disposisi_tambah.html', {'form': form ,'no_surat': no_surat, 'page_surat_active':'active'})
-
-@login_required
-def disposisi_edit(request, id_disposisi):
-
-    dataDisposisi = Disposisi.objects.get(id=id_disposisi)
-
-    # A HTTP POST?
-    if request.method == 'POST':
-        form = DisposisiForm(request.POST, instance=dataDisposisi)
-
-        # Have we been provided with a valid form?
-        if form.is_valid():
-
-            form.save(commit=True)
-
-            # go to surat view
-            return surat_detail(request, dataDisposisi.surat.no_surat)
-
-        else:
-            # The supplied form contained errors - just print them to the terminal.
-            print(form.errors)
-    else:
-        # If the request was not a POST, display the form to enter details.
-        form = DisposisiForm(instance=dataDisposisi)
-
-    return render(request, 'MainApp/disposisi_edit.html', {'form': form ,'id_disposisi': id_disposisi, 'page_surat_active':'active'})
-
-@login_required
-def disposisi_delete(request, no_surat, id_disposisi):
-    try:
-        # get data surat
-        dataDisposisi = Disposisi.objects.get(id=id_disposisi)
-
-        dataDisposisi.delete()
-
-    except Disposisi.DoesNotExist:
-        # jika data surat yang diinginkan untuk dihapus tidak ditemukan, tampilkan daftar semua surat
-        return surat(request)
-
-    return surat_detail(request, no_surat)
-
-    #return render(request, 'MainApp/surat.html', context_dict)
 
 @login_required
 def user(request):
@@ -616,8 +491,7 @@ def user_detail(request, username):
         # get data userprofile
         user_profile = UserProfile.objects.get(user=user)
 
-
-    except Disposisi.DoesNotExist:
+    except UserProfile.DoesNotExist:
          user_profile = None
 
     data = {'user_profile': user_profile, 'page_user_active':'active'}

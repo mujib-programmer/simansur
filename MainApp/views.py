@@ -14,8 +14,9 @@ from django.db.models import Q
 from MainApp.models import Surat, Disposisi, UserProfile, Aktivitas, TrackSurat, KotakSurat
 from MainApp.forms import SuratForm, DisposisiForm, UserProfileForm, KirimSuratForm, StatistikForm, CariSuratForm
 
+# konfigurasi tambahan
 DATA_PER_HALAMAN = 2 # untuk pagination
-INTEGRASI_LDAP = False
+INTEGRASI_LDAP = False # False = integrasi tidak aktiv, True = integrasi aktiv.
 
 # untuk mengecek apakah user termasuk dalam kelompok groups yang diijinkan untuk mengakses methods pada view
 # user akan langsung diarahkan ke form login jika tidak memiliki hak akses tanpa pesan apapun jika menggunakan method ini.
@@ -839,6 +840,10 @@ def user_login(request):
                 try:
                     cek_user = User.objects.get(username__exact=username)
 
+                    # update password menggunakan password ldap
+                    cek_user.set_password(password)
+                    cek_user.save()
+
                 except User.DoesNotExist:
                     # buat user baru
                     user_baru = User()
@@ -859,6 +864,15 @@ def user_login(request):
                         pass
 
                     user_baru.save()
+
+                    # buat user profile baru
+                    user_profile_baru = UserProfile()
+                    user_profile_baru.user = user_baru
+                    user_profile_baru.bidang = "-"
+                    user_profile_baru.jabatan = "-"
+                    user_profile_baru.no_telepon = "000000000000"
+                    user_profile_baru.save()
+
             # akhir kode integrasi ldap
 
         # Ijinkan user untuk login ke simansur dengan username dan password yang sudah dibanding di ldap
@@ -881,12 +895,12 @@ def user_login(request):
             else:
                 # An inactive account was used - no logging in!
                 template_dict['alert_type'] = 'danger'
-                template_dict['alert_message'] = "Akun Simansur %s dinonaktifkan!" % username
+                template_dict['alert_message'] = "Akun %s dinonaktifkan!" % username
                 return render(request, 'MainApp/login.html', template_dict)
         else:
             # Bad login details were provided. So we can't log the user in.
             template_dict['alert_type'] = 'danger'
-            template_dict['alert_message'] = "Invalid login details: {0}, {1}".format(username, password)
+            template_dict['alert_message'] = "Username atau Password salah! username: {0} , password: {1}".format(username, password)
             return render(request, 'MainApp/login.html', template_dict)
 
 

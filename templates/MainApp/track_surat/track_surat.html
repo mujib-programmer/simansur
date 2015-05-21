@@ -18,9 +18,9 @@
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Surat</th>
-                    <th>Tanggal Surat</th>
-                    <th>Status Surat</th>
+                    <th>No Surat</th>
+                    <th>Tanggal</th>
+                    <th>Status Track Surat</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -47,7 +47,54 @@
         </div>
 
         <div class="page-header">
-            <h1>Detail Surat</h1>
+            <h1>Status Pengiriman Surat</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {% if semua_pengiriman_surat %}
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>No Surat</th>
+                    <th>Tanggal</th>
+                    <th>Pengirim</th>
+                    <th>Penerima</th>
+                    <th>Status Surat</th>
+                    <th>Jenis Pengiriman</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                {% for pengiriman_surat in semua_pengiriman_surat %}
+
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ pengiriman_surat.surat }}</td>
+                    <td>{{ pengiriman_surat.tanggal }}</td>
+                    <td>{{ pengiriman_surat.pengirim }}</td>
+                    <td>{{ pengiriman_surat.penerima }}</td>
+                    <td>{{ pengiriman_surat.status }}</td>
+                    <td>{{ pengiriman_surat.jenis_pengiriman }}</td>
+                  </tr>
+
+                  {% endfor %}
+
+                </tbody>
+              </table>
+
+                {% else %}
+                    <p>Tidak ada data pengiriman surat untuk surat ini</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Detail Label Surat</h1>
         </div>
 
         <div class="row">
@@ -88,6 +135,24 @@
                 <tr>
                     <td>File Surat</td>
                     <td><a href="{% url 'surat_download' no_surat=surat.no_surat %}">Download</a></td>
+                </tr>
+                <tr>
+                    <td>Aksi</td>
+                    <td>
+                        <a href="/surat_pengguna/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Lihat Kotak Masuk</span>
+                        </button>
+                        </a>
+
+                        {% if perms.MainApp.add_surat %}
+                        <a href="/surat/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Daftar Label Surat</span>
+                        </button>
+                        </a>
+                        {% endif %}
+                    </td>
                 </tr>
                 </tbody>
               </table>

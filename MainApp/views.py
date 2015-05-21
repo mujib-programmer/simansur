@@ -396,8 +396,10 @@ def surat_pengguna_detail(request, id):
     # get data surat
     data_surat = KotakSurat.objects.get(id=id)
 
-    # ubah status surat menjadi dibaca
-    data_surat.status = "dibaca"
+    # hanya ubah status surat menjadi dibaca jika sebelum itu statusnya diterima
+    if data_surat.status == "diterima":
+        data_surat.status = "dibaca"
+
     data_surat.save()
 
     data['surat'] = data_surat
@@ -831,7 +833,7 @@ def user_login(request):
             # user belum login via ldap
             if ldap_resp['state'] != 1:
                 template_dict['alert_type'] = 'danger'
-                template_dict['alert_message'] = "Username atau Password salah! username: {0} , password: {1}".format(username, password)
+                template_dict['alert_message'] = "Gagal login ke LDAP UI. Username atau Password salah!"
                 return render(request, 'MainApp/login.html', template_dict)
 
             # user sudah login via ldap
@@ -900,7 +902,7 @@ def user_login(request):
         else:
             # Bad login details were provided. So we can't log the user in.
             template_dict['alert_type'] = 'danger'
-            template_dict['alert_message'] = "Username atau Password salah! username: {0} , password: {1}".format(username, password)
+            template_dict['alert_message'] = "Gagal login. Username atau Password salah!"
             return render(request, 'MainApp/login.html', template_dict)
 
 
@@ -930,10 +932,12 @@ def track_surat(request, no_surat):
     user_saat_ini = request.user
 
     data_surat = Surat.objects.get(no_surat=no_surat)
-    semua_track_surat = TrackSurat.objects.filter(surat=data_surat)
+    semua_track_surat = TrackSurat.objects.filter(surat=data_surat).order_by('tanggal')
+    semua_pengiriman_surat = KotakSurat.objects.filter(surat=data_surat).order_by('tanggal')
 
     data['surat'] = data_surat
     data['semua_track_surat'] = semua_track_surat
+    data['semua_pengiriman_surat'] = semua_pengiriman_surat
     data['no_surat'] = no_surat
 
     return render(request, 'MainApp/track_surat/track_surat.html', data)
@@ -1083,6 +1087,9 @@ def user_dalam_group(user, nama_group):
     return user.groups.filter(name=nama_group).exists()
 
 def kirim_notifikasi(user):
-    # lihat di catatan project
+    # dapatkan data user profile
+    # dapatkan data no_telepon dari user profile
+    # buat template pesan untuk dikirimkan
+    # kirim sms ke no tersebut
     pass
 

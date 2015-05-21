@@ -6,7 +6,7 @@
 
 {% block content%}
         <div class="page-header">
-            <h1>Form Pencarian Surat</h1>
+            <h1>Form Pencarian Label Surat</h1>
         </div>
 
         <div class="row">
@@ -41,7 +41,7 @@
 
         <div class="row page-header">
             <div class="col-md-10">
-                <h1>Daftar Surat</h1>
+                <h1>Daftar Label Surat</h1>
             </div>
 
             {% if perms.MainApp.add_surat %}
@@ -156,7 +156,7 @@
               </div>
 
                 {% else %}
-                    <p>Tidak ada surat di kotak surat</p>
+                    <p>Tidak ada data label surat.</p>
                     <p>
                         {% if perms.MainApp.add_surat %}
                         <a href="{% url 'surat_tambah' %}">

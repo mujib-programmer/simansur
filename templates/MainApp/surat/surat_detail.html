@@ -6,7 +6,7 @@
 
 {% block content%}
         <div class="page-header">
-            <h1>Detail Surat</h1>
+            <h1>Detail Label Surat</h1>
         </div>
 
         <div class="row">
@@ -67,11 +67,19 @@
                         </a>
                         {% endif %}
 
-                        <a href="/surat/" >
+                        <a href="/surat_pengguna/" >
                         <button type="button" class="btn btn-default" aria-label="Left Align">
-                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Lihat Daftar Surat</span>
+                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Lihat Kotak Masuk</span>
                         </button>
                         </a>
+
+                        {% if perms.MainApp.add_surat %}
+                        <a href="/surat/" >
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon glyphicon-list" aria-hidden="true"> Daftar Label Surat</span>
+                        </button>
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 </tbody>

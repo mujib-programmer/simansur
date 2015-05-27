@@ -994,6 +994,7 @@ def statistik(request):
 
         else:
             print(form.errors)
+            return render(request, "MainApp/statistik/statistik.html", data)
 
     else:
         bulan = datetime.now().month
@@ -1091,5 +1092,6 @@ def kirim_notifikasi(user):
     # dapatkan data no_telepon dari user profile
     # buat template pesan untuk dikirimkan
     # kirim sms ke no tersebut
-    pass
+	pass
+
 

@@ -76,8 +76,8 @@ class KirimSuratForm(forms.Form):
 
 class StatistikForm(forms.Form):
     #bulan = forms.ChoiceField(label='Bulan', choices=BULAN_CHOICES)
-    bulan = forms.IntegerField(label="Bulan")
-    tahun = forms.IntegerField(label="Tahun")
+    bulan = forms.IntegerField(label="Bulan", required=True)
+    tahun = forms.IntegerField(label="Tahun", required=True)  
 
 class CariSuratForm(forms.Form):
     kata_kunci = forms.CharField(label="Kata Kunci", max_length=50)
